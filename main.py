@@ -52,7 +52,10 @@ def handle_run(args):
     synthesize_voice(
         text=script_data["script"],
         output_audio_path=audio_path,
-        voice=args.voice or CONFIG["tts"]["voice"]
+        provider=args.voice_provider or "edge-tts",
+        voice=args.voice or CONFIG["tts"]["voice"],
+        reference_audio=args.reference_audio,
+        elevenlabs_voice_id=args.voice_id
     )
 
     # 4. Subtítulos
@@ -103,6 +106,9 @@ def main():
     run_parser.add_argument("--author", default="Agencia Central", help="Nombre del autor o fuente")
     run_parser.add_argument("--handle", default="@noticias", help="Handle de la red social")
     run_parser.add_argument("--voice", default=None, help="Nombre de voz Edge-TTS (ej. es-MX-DaliaNeural)")
+    run_parser.add_argument("--voice-provider", default="edge-tts", choices=["edge-tts", "local-clone", "elevenlabs"], help="Motor de voz")
+    run_parser.add_argument("--reference-audio", default=None, help="Ruta al audio WAV (6-10s) para clonación de voz")
+    run_parser.add_argument("--voice-id", default=None, help="Voice ID para ElevenLabs")
     run_parser.add_argument("--broll", default=None, help="Ruta a clip de B-roll de fondo opcional")
     run_parser.add_argument("--bgm", default=None, help="Ruta a música de fondo opcional")
 
