@@ -1,0 +1,24 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments and Secrets
+.env
+client_secrets.json
+token.json
+oauth_credentials.json
+
+# Output media (generated videos, intermediate audio and temp subs)
+output/*
+!output/.gitkeep
+
+# Temporary test files
+temp/
+*.log
+.pytest_cache/
+
+# OS specific
+Thumbs.db
+Desktop.ini
+.DS_Store

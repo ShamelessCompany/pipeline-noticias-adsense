@@ -1,0 +1,32 @@
+{
+  "video": {
+    "width": 1080,
+    "height": 1920,
+    "fps": 30,
+    "card_max_width": 960,
+    "zoom_effect": true,
+    "bg_blur_sigma": 20
+  },
+  "tts": {
+    "voice": "es-MX-DaliaNeural",
+    "rate": "+0%",
+    "pitch": "+0Hz"
+  },
+  "subtitles": {
+    "whisper_model": "base",
+    "whisper_device": "cpu",
+    "font_name": "Arial",
+    "font_size": 76,
+    "primary_color": "&H00FFFFFF",
+    "karaoke_color": "&H0000FFFF",
+    "outline_color": "&H00000000",
+    "outline_width": 4,
+    "shadow_depth": 2,
+    "margin_v": 450
+  },
+  "adsense_compliance": {
+    "min_editorial_words": 80,
+    "require_critical_analysis": true,
+    "require_human_checkpoint": true
+  }
+}
