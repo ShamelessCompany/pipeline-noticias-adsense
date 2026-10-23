@@ -98,6 +98,10 @@ def main():
     # Comando demo
     subparsers.add_parser("demo", help="Ejecuta la demo completa de extremo a extremo")
 
+    # Comando studio
+    studio_parser = subparsers.add_parser("studio", help="Inicia la interfaz visual web (Studio)")
+    studio_parser.add_argument("--port", type=int, default=5000, help="Puerto del servidor web")
+
     # Comando run
     run_parser = subparsers.add_parser("run", help="Procesa una noticia personalizada")
     run_parser.add_argument("--topic", required=True, help="Tema o titular de la noticia")
@@ -123,6 +127,9 @@ def main():
 
     if args.command == "demo" or args.command is None:
         run_demo()
+    elif args.command == "studio":
+        from app import run_server
+        run_server(port=args.port)
     elif args.command == "run":
         handle_run(args)
     elif args.command == "upload":

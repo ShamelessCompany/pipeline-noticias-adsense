@@ -119,8 +119,22 @@ En `config.json` puedes ajustar:
 
 ## 5. Ejecución
 
-### Opción A: Ejecutar la Demo Completa (Recomendado)
-Genera un video completo de demostración en ~60 segundos con todos los componentes del pipeline:
+### Opción A: Estudio Visual Web Interactivo (Recomendado para Edición y Revisión)
+Inicia la interfaz gráfica completa en tu navegador local (`http://127.0.0.1:5000`):
+```powershell
+python app.py
+# O alternativamente:
+python main.py studio
+```
+**Características del Estudio Visual:**
+* **Entrada de Noticias y Enlaces:** Pega URLs públicas (tweets, notas) o ingresa titulares y fragmentos.
+* **Taller de Guion con Tonalidades Contextuales:** Selector de 4 presets (*Última Hora*, *Investigación*, *Polémica*, *Futurista*) + campo para dar instrucciones personalizadas a la IA para retocar el texto y las pausas.
+* **Control de Voz y Locución:** Selector de voces neuronales, ajuste de velocidad/tono, clonación local con muestra `.wav` y escucha previa inmediata del audio generado.
+* **Vista Previa en Vivo:** Reproductor vertical 9:16 que muestra la tarjeta, la pista de audio y el video final compilado con subtítulos karaoke listos para descargar o aprobar.
+* **Ejecución Paso a Paso o en Cascada:** Puedes ejecutar cada fase por separado para retocar lo justo y necesario o pulsar *"Ejecutar Todo el Pipeline en Cascada"*.
+
+### Opción B: Ejecutar la Demo por Consola
+Genera un video completo de demostración en ~60 segundos desde la terminal:
 ```powershell
 python demo.py
 ```

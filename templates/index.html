@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AdSense Shorts Studio - Pipeline Visual de Noticias</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f2937;
+      --accent: #38bdf8;
+      --accent-hover: #0284c7;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --font: 'Plus Jakarta Sans', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    header {
+      background: rgba(17, 24, 39, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .logo-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-badge {
+      background: linear-gradient(135deg, #38bdf8, #818cf8);
+      color: #090d16;
+      font-weight: 800;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+    }
+    .logo-title {
+      font-size: 18px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .compliance-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--success);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Stepper Bar */
+    .stepper {
+      background: #0f172a;
+      border-bottom: 1px solid var(--card-border);
+      padding: 12px 32px;
+      display: flex;
+      justify-content: space-between;
+      overflow-x: auto;
+      gap: 16px;
+    }
+    .step-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: color 0.2s;
+      white-space: nowrap;
+    }
+    .step-item.active { color: var(--accent); }
+    .step-item.completed { color: var(--success); }
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: #1e293b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+    }
+    .step-item.active .step-num { background: var(--accent); color: #090d16; }
+    .step-item.completed .step-num { background: var(--success); color: #090d16; }
+
+    /* Main Layout */
+    .main-workspace {
+      display: grid;
+      grid-template-columns: 1fr 480px;
+      gap: 24px;
+      padding: 28px 32px;
+      flex: 1;
+      max-width: 1600px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    /* Cards */
+    .section-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    }
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .input-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+    }
+    input[type="text"], textarea, select {
+      width: 100%;
+      background: #090d16;
+      border: 1px solid #374151;
+      border-radius: 10px;
+      color: var(--text-main);
+      padding: 12px 14px;
+      font-family: inherit;
+      font-size: 14px;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    input[type="text"]:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+
+    /* Tonal Buttons Bar */
+    .tonality-bar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .btn-tone {
+      background: #1f2937;
+      border: 1px solid #374151;
+      border-radius: 8px;
+      color: var(--text-main);
+      padding: 10px 12px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+    .btn-tone:hover { border-color: var(--accent); }
+    .btn-tone.selected {
+      background: rgba(56, 189, 248, 0.15);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: var(--accent);
+      color: #090d16;
+    }
+    .btn-primary:hover { background: #7dd3fc; transform: translateY(-1px); }
+    .btn-secondary {
+      background: #1f2937;
+      border: 1px solid #374151;
+      color: var(--text-main);
+    }
+    .btn-secondary:hover { background: #374151; }
+    .btn-success {
+      background: var(--success);
+      color: #090d16;
+    }
+    .btn-success:hover { background: #34d399; }
+    .btn-master {
+      background: linear-gradient(135deg, #0284c7, #6366f1);
+      color: white;
+      font-size: 15px;
+      width: 100%;
+      padding: 14px;
+      box-shadow: 0 4px 15px rgba(2, 132, 199, 0.35);
+    }
+    .btn-master:hover { opacity: 0.95; transform: translateY(-2px); }
+
+    /* Live Preview Panel */
+    .preview-panel {
+      position: sticky;
+      top: 90px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .player-container {
+      background: #000000;
+      border-radius: 16px;
+      border: 1px solid var(--card-border);
+      overflow: hidden;
+      aspect-ratio: 9 / 16;
+      max-height: 640px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    }
+    .player-container video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .player-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+    }
+    .player-placeholder {
+      color: var(--text-muted);
+      font-size: 14px;
+      text-align: center;
+      padding: 20px;
+    }
+    .audio-player-box {
+      background: #111827;
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    audio { width: 100%; height: 36px; border-radius: 6px; }
+
+    /* Log Box */
+    .terminal-box {
+      background: #050811;
+      border: 1px solid #1f2937;
+      border-radius: 12px;
+      padding: 14px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: #38bdf8;
+      max-height: 160px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Utilities */
+    .flex-row { display: flex; gap: 12px; align-items: center; }
+    .badge {
+      background: rgba(255, 255, 255, 0.08);
+      padding: 4px 8px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-family: var(--font-mono);
+    }
+    .spinner {
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-radius: 50%;
+      border-top: 3px solid var(--accent);
+      width: 18px;
+      height: 18px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <div class="logo-group">
+      <span class="logo-badge">STUDIO</span>
+      <h1 class="logo-title">Pipeline de Noticias AdSense</h1>
+    </div>
+    <div class="compliance-pill">
+      <span>●</span> Escudo Anti-Desmonetización Activo
+    </div>
+  </header>
+
+  <!-- Visual Pipeline Stepper -->
+  <div class="stepper">
+    <div class="step-item active" id="step-nav-1"><span class="step-num">1</span> Fuente & Scraper</div>
+    <div class="step-item" id="step-nav-2"><span class="step-num">2</span> Guion & Tonalidad</div>
+    <div class="step-item" id="step-nav-3"><span class="step-num">3</span> Voz & Locución</div>
+    <div class="step-item" id="step-nav-4"><span class="step-num">4</span> Subtítulos & Video 9:16</div>
+    <div class="step-item" id="step-nav-5"><span class="step-num">5</span> Aprobación Final</div>
+  </div>
+
+  <!-- Workspace -->
+  <main class="main-workspace">
+
+    <!-- Left Controls Column -->
+    <div class="controls-column">
+
+      <!-- PASO 1: Fuente y Captura -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title"><span>📡</span> 1. Entrada de Noticia / Enlace Web</h2>
+          <span class="badge" id="badge-source">Playwright Dark Mode</span>
+        </div>
+
+        <div class="input-group">
+          <label for="input-url">Enlace Web o Tweet (Opcional para Scraper en Vivo)</label>
+          <input type="text" id="input-url" placeholder="https://x.com/... o https://noticias.com/articulo">
+        </div>
+
+        <div class="input-group">
+          <label for="input-topic">Titular o Tema Central *</label>
+          <input type="text" id="input-topic" value="OpenAI y Google anuncian nuevos estándares abiertos de IA" placeholder="Ej: Nueva alianza en chips cuánticos...">
+        </div>
+
+        <div class="input-group">
+          <label for="input-content">Contenido / Fragmento Original *</label>
+          <textarea id="input-content" rows="3">Se acaba de presentar una alianza sin precedentes para estandarizar la interoperabilidad de modelos generativos. El código abierto y la seguridad serán obligatorios para todas las plataformas comerciales a partir del próximo trimestre.</textarea>
+        </div>
+
+        <div class="flex-row" style="margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label for="input-author">Autor / Medio</label>
+            <input type="text" id="input-author" value="Tech Dispatch">
+          </div>
+          <div style="flex: 1;">
+            <label for="input-handle">Handle Social</label>
+            <input type="text" id="input-handle" value="@techdispatch_es">
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="executeStep1Scraper()">
+          <span>📸</span> Capturar Tarjeta en Modo Oscuro
+        </button>
+      </section>
+
+      <!-- PASO 2: Taller de Guion y Modulación Tonal -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title"><span>✍️</span> 2. Taller de Guion & Modulación Tonal</h2>
+          <span class="badge" id="badge-wordcount">0 palabras</span>
+        </div>
+
+        <!-- Botones de Tonalidad Contextual -->
+        <label>Tonalidad del Guion:</label>
+        <div class="tonality-bar">
+          <button class="btn-tone selected" onclick="selectTonality(this, 'urgente')">⚡ Última Hora</button>
+          <button class="btn-tone" onclick="selectTonality(this, 'investigativo')">🔍 Investigación</button>
+          <button class="btn-tone" onclick="selectTonality(this, 'polemica')">🔥 Polémica</button>
+          <button class="btn-tone" onclick="selectTonality(this, 'tecnologico')">🚀 Futurista</button>
+        </div>
+
+        <div class="input-group">
+          <label for="script-editor">Guion Locutado (Editable en Vivo) *</label>
+          <textarea id="script-editor" rows="6" placeholder="Haz clic en 'Generar Guion' o escribe tu borrador..."></textarea>
+        </div>
+
+        <div class="input-group">
+          <label for="input-refine-instruction">Instrucción para Retocar Tonalidad (Opcional):</label>
+          <input type="text" id="input-refine-instruction" placeholder="Ej: Añade más tensión en el segundo 15, o pausa dramática antes del debate...">
+        </div>
+
+        <div class="flex-row">
+          <button class="btn btn-primary" onclick="generateInitialScript()">
+            <span>✨</span> Generar Guion con IA
+          </button>
+          <button class="btn btn-secondary" onclick="refineCurrentScript()">
+            <span>🎚️</span> Aplicar Tonalidad Seleccionada
+          </button>
+        </div>
+      </section>
+
+      <!-- PASO 3: Voz y Locución -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title"><span>🎙️</span> 3. Voz, Locución & Clonación</h2>
+          <span class="badge" id="badge-voice">Edge-TTS Neural</span>
+        </div>
+
+        <div class="flex-row" style="margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label for="select-voice-provider">Motor de Voz</label>
+            <select id="select-voice-provider" onchange="toggleVoiceFields()">
+              <option value="edge-tts">Edge-TTS (Gratis / Sin GPU / Optimizado)</option>
+              <option value="local-clone">Clonación Local (XTTS-v2 / Muestra WAV)</option>
+              <option value="elevenlabs">ElevenLabs API (Clonación Expresiva)</option>
+            </select>
+          </div>
+          <div style="flex: 1;" id="box-edge-voice">
+            <label for="select-voice">Voz Neuronal</label>
+            <select id="select-voice">
+              <option value="es-MX-DaliaNeural">Dalia (México - Dinámica)</option>
+              <option value="es-ES-AlvaroNeural">Álvaro (España - Serio / Noticiero)</option>
+              <option value="es-CO-GonzaloNeural">Gonzalo (Colombia - Cálido)</option>
+              <option value="es-AR-TomasNeural">Tomás (Argentina - Ágil)</option>
+            </select>
+          </div>
+        </div>
+
+        <div id="box-clone-ref" style="display: none; margin-bottom: 16px;">
+          <label for="input-clone-path">Ruta al Audio WAV de Referencia (6-10 seg):</label>
+          <input type="text" id="input-clone-path" value="assets/audio/voice_reference.wav">
+        </div>
+
+        <div id="box-elevenlabs" style="display: none; margin-bottom: 16px;">
+          <label for="input-eleven-id">Voice ID de ElevenLabs:</label>
+          <input type="text" id="input-eleven-id" placeholder="ej. 21m00Tcm4TlvDq8ikWAM">
+        </div>
+
+        <div class="flex-row" style="margin-bottom: 16px;">
+          <div style="flex: 1;">
+            <label for="input-voice-rate">Velocidad</label>
+            <input type="text" id="input-voice-rate" value="+2%">
+          </div>
+          <div style="flex: 1;">
+            <label for="input-voice-pitch">Tono</label>
+            <input type="text" id="input-voice-pitch" value="+0Hz">
+          </div>
+        </div>
+
+        <button class="btn btn-secondary" onclick="synthesizeVoiceAudio()">
+          <span>🔊</span> Sintetizar y Escuchar Voz
+        </button>
+      </section>
+
+      <!-- PASO 4: Subtítulos y Composición FFmpeg -->
+      <section class="section-card">
+        <div class="section-header">
+          <h2 class="section-title"><span>🎬</span> 4. Ensamblado de Video (FFmpeg 9:16)</h2>
+          <span class="badge">1080x1920 (Shorts)</span>
+        </div>
+
+        <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+          Aplica subtítulos palabra por palabra (.ASS karaoke) con Faster-Whisper, zoom dinámico en la tarjeta y mezcla de audio con ducking.
+        </p>
+
+        <button class="btn btn-primary" onclick="assembleFinalVideo()">
+          <span>🎞️</span> Compilar Video Vertical 9:16
+        </button>
+      </section>
+
+      <!-- Botón Maestro -->
+      <div style="margin-bottom: 30px;">
+        <button class="btn btn-master" onclick="runFullPipeline()">
+          <span>🚀</span> Ejecutar Todo el Pipeline en Cascada
+        </button>
+      </div>
+
+      <!-- Consola de Ejecución -->
+      <div class="section-card">
+        <div class="section-header">
+          <h3 class="section-title" style="font-size: 14px;"><span>💻</span> Terminal de Ejecución en Vivo</h3>
+          <span id="exec-status">Listo</span>
+        </div>
+        <div class="terminal-box" id="terminal-log">Esperando instrucciones...</div>
+      </div>
+
+    </div>
+
+    <!-- Right Live Preview Column -->
+    <div class="preview-panel">
+
+      <!-- Contenedor de Video / Imagen -->
+      <div class="player-container" id="player-box">
+        <div class="player-placeholder" id="player-placeholder">
+          <span style="font-size: 32px; display: block; margin-bottom: 10px;">📱</span>
+          La vista previa de la tarjeta o del video 9:16 aparecerá aquí al ejecutar cada paso.
+        </div>
+        <img id="preview-image" style="display: none;" alt="Vista previa de captura">
+        <video id="preview-video" style="display: none;" controls loop autoplay playsinline></video>
+      </div>
+
+      <!-- Reproductor de Audio -->
+      <div class="audio-player-box" id="audio-box" style="display: none;">
+        <label>Pista de Voz Locutada:</label>
+        <audio id="audio-player" controls></audio>
+      </div>
+
+      <!-- Acciones de Aprobación -->
+      <div class="section-card" id="approval-card" style="display: none;">
+        <h3 style="font-size: 15px; margin-bottom: 12px; color: var(--success);">✓ Video Listo para Publicar</h3>
+        <div class="flex-row">
+          <a id="btn-download" href="#" download class="btn btn-secondary" style="flex: 1; text-decoration: none;">
+            Descargar MP4
+          </a>
+          <button class="btn btn-success" style="flex: 1;" onclick="approveAndPublish()">
+            Aprobar
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <script>
+    let currentTonality = 'urgente';
+
+    function selectTonality(btn, tone) {
+      document.querySelectorAll('.btn-tone').forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      currentTonality = tone;
+      log(`Tonalidad seleccionada: ${tone.toUpperCase()}`);
+    }
+
+    function toggleVoiceFields() {
+      const provider = document.getElementById('select-voice-provider').value;
+      document.getElementById('box-edge-voice').style.display = provider === 'edge-tts' ? 'block' : 'none';
+      document.getElementById('box-clone-ref').style.display = provider === 'local-clone' ? 'block' : 'none';
+      document.getElementById('box-elevenlabs').style.display = provider === 'elevenlabs' ? 'block' : 'none';
+    }
+
+    function log(msg) {
+      const term = document.getElementById('terminal-log');
+      const time = new Date().toLocaleTimeString();
+      term.innerText += `\n[${time}] ${msg}`;
+      term.scrollTop = term.scrollHeight;
+    }
+
+    function setStatus(text, isBusy = false) {
+      const st = document.getElementById('exec-status');
+      if (isBusy) {
+        st.innerHTML = `<span class="spinner"></span> ${text}`;
+      } else {
+        st.innerText = text;
+      }
+    }
+
+    function setStepCompleted(stepNum) {
+      const item = document.getElementById(`step-nav-${stepNum}`);
+      if (item) item.classList.add('completed');
+    }
+
+    // PASO 1: Captura con Playwright
+    async function executeStep1Scraper() {
+      setStatus('Capturando en Playwright...', true);
+      log('Iniciando captura de tarjeta en Modo Oscuro con Playwright...');
+
+      const payload = {
+        url: document.getElementById('input-url').value,
+        topic: document.getElementById('input-topic').value,
+        content: document.getElementById('input-content').value,
+        author: document.getElementById('input-author').value,
+        handle: document.getElementById('input-handle').value
+      };
+
+      try {
+        const res = await fetch('/api/step/capture', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          log(`✓ Tarjeta capturada: ${data.card_path}`);
+          showPreviewImage(data.card_url);
+          setStepCompleted(1);
+          setStatus('Tarjeta lista');
+        } else {
+          log(`✕ Error en captura: ${data.error}`);
+          setStatus('Error');
+        }
+      } catch (err) {
+        log(`✕ Error de conexión: ${err.message}`);
+        setStatus('Error');
+      }
+    }
+
+    // PASO 2: Generar Guion Inicial
+    async function generateInitialScript() {
+      setStatus('Generando guion...', true);
+      log(`Generando guion con IA aplicando tonalidad '${currentTonality}'...`);
+
+      const payload = {
+        topic: document.getElementById('input-topic').value,
+        content: document.getElementById('input-content').value,
+        tonality: currentTonality
+      };
+
+      try {
+        const res = await fetch('/api/step/generate-script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('script-editor').value = data.script;
+          document.getElementById('badge-wordcount').innerText = `${data.word_count} palabras`;
+          log(`✓ Guion generado (${data.word_count} palabras) vía ${data.engine}`);
+          setStepCompleted(2);
+          setStatus('Guion generado');
+        } else {
+          log(`✕ Error: ${data.error}`);
+          setStatus('Error');
+        }
+      } catch (err) {
+        log(`✕ Error: ${err.message}`);
+        setStatus('Error');
+      }
+    }
+
+    // PASO 2B: Retocar Tonalidad
+    async function refineCurrentScript() {
+      const script = document.getElementById('script-editor').value;
+      if (!script) {
+        alert('Escribe o genera un guion primero.');
+        return;
+      }
+      setStatus('Modulando tonalidad...', true);
+      log(`Aplicando modulación tonal: ${currentTonality}...`);
+
+      const payload = {
+        script: script,
+        tonality: currentTonality,
+        user_instruction: document.getElementById('input-refine-instruction').value
+      };
+
+      try {
+        const res = await fetch('/api/step/refine-script', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('script-editor').value = data.script;
+          document.getElementById('badge-wordcount').innerText = `${data.word_count} palabras`;
+          log(`✓ Guion reescrito con tono '${data.preset_name}'`);
+          setStatus('Tono aplicado');
+        } else {
+          log(`✕ Error al retocar: ${data.error}`);
+          setStatus('Error');
+        }
+      } catch (err) {
+        log(`✕ Error: ${err.message}`);
+        setStatus('Error');
+      }
+    }
+
+    // PASO 3: Sintetizar Voz
+    async function synthesizeVoiceAudio() {
+      const script = document.getElementById('script-editor').value;
+      if (!script) {
+        alert('Se requiere un guion en el paso 2.');
+        return;
+      }
+      setStatus('Sintetizando voz...', true);
+      log('Sintetizando locución con preprocesamiento rítmico y pausas...');
+
+      const payload = {
+        script: script,
+        provider: document.getElementById('select-voice-provider').value,
+        voice: document.getElementById('select-voice').value,
+        rate: document.getElementById('input-voice-rate').value,
+        pitch: document.getElementById('input-voice-pitch').value,
+        reference_audio: document.getElementById('input-clone-path').value,
+        voice_id: document.getElementById('input-eleven-id').value
+      };
+
+      try {
+        const res = await fetch('/api/step/synthesize-voice', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (data.success) {
+          showPreviewAudio(data.audio_url);
+          log(`✓ Audio generado exitosamente.`);
+          setStepCompleted(3);
+          setStatus('Voz sintetizada');
+        } else {
+          log(`✕ Error en audio: ${data.error}`);
+          setStatus('Error');
+        }
+      } catch (err) {
+        log(`✕ Error: ${err.message}`);
+        setStatus('Error');
+      }
+    }
+
+    // PASO 4: Ensamblado FFmpeg
+    async function assembleFinalVideo() {
+      setStatus('Compilando video 9:16...', true);
+      log('Generando subtítulos karaoke con Faster-Whisper y ensamblando en FFmpeg...');
+
+      try {
+        const res = await fetch('/api/step/assemble-video', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const data = await res.json();
+        if (data.success) {
+          showPreviewVideo(data.video_url);
+          setStepCompleted(4);
+          setStepCompleted(5);
+          setStatus('¡Video completado!');
+          log(`✓ Video compilado: ${data.video_path}`);
+          document.getElementById('approval-card').style.display = 'block';
+          document.getElementById('btn-download').href = data.video_url;
+        } else {
+          log(`✕ Error en video: ${data.error}`);
+          setStatus('Error');
+        }
+      } catch (err) {
+        log(`✕ Error: ${err.message}`);
+        setStatus('Error');
+      }
+    }
+
+    // Pipeline Completo
+    async function runFullPipeline() {
+      log('====================================================');
+      log('Iniciando ejecución completa del pipeline en cascada...');
+      await executeStep1Scraper();
+      await generateInitialScript();
+      await synthesizeVoiceAudio();
+      await assembleFinalVideo();
+      log('====================================================');
+      log('✓ Pipeline completado. Puedes revisar y descargar el video.');
+    }
+
+    function showPreviewImage(url) {
+      const ph = document.getElementById('player-placeholder');
+      const img = document.getElementById('preview-image');
+      const vid = document.getElementById('preview-video');
+      ph.style.display = 'none';
+      vid.style.display = 'none';
+      img.style.display = 'block';
+      img.src = `${url}?t=${Date.now()}`;
+    }
+
+    function showPreviewAudio(url) {
+      const box = document.getElementById('audio-box');
+      const player = document.getElementById('audio-player');
+      box.style.display = 'flex';
+      player.src = `${url}?t=${Date.now()}`;
+      player.play().catch(() => {});
+    }
+
+    function showPreviewVideo(url) {
+      const ph = document.getElementById('player-placeholder');
+      const img = document.getElementById('preview-image');
+      const vid = document.getElementById('preview-video');
+      ph.style.display = 'none';
+      img.style.display = 'none';
+      vid.style.display = 'block';
+      vid.src = `${url}?t=${Date.now()}`;
+      vid.load();
+      vid.play().catch(() => {});
+    }
+
+    function approveAndPublish() {
+      alert('✓ Video Aprobado por el Editor Humano. Metadatos listos para subir a YouTube Shorts.');
+    }
+  </script>
+</body>
+</html>
