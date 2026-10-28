@@ -1,0 +1,146 @@
+[
+  {
+    "id": "curiosidades",
+    "nombre": "Curiosidades",
+    "descripcion": "Datos raros del mundo, ciencia cotidiana y cosas que nadie explica bien",
+    "activo": true,
+    "formato": "short",
+    "formato_clips": "short",
+    "tono": "cercano, curioso, con humor seco",
+    "voz": "es-MX-JorgeNeural",
+    "velocidad_voz": "+6%",
+    "color_subtitulos": "amarillo",
+    "categoria": "educacion",
+    "videos_por_dia": 2,
+    "horarios": [
+      "12:00",
+      "19:00"
+    ],
+    "tags_base": [
+      "curiosidades",
+      "sabias que",
+      "datos curiosos"
+    ],
+    "canales_referencia": [],
+    "temas_semilla": [
+      "Por qué el cielo es azul y los atardeceres naranjas",
+      "El pulpo tiene tres corazones",
+      "Por qué los aviones no vuelan en línea recta"
+    ],
+    "canal_youtube": "principal"
+  },
+  {
+    "id": "historia",
+    "nombre": "Historia",
+    "descripcion": "Historias reales poco conocidas, contadas como anécdota",
+    "activo": true,
+    "formato": "largo",
+    "formato_clips": "short",
+    "tono": "narrador de sobremesa, suspenso suave",
+    "voz": "es-ES-AlvaroNeural",
+    "velocidad_voz": "+0%",
+    "color_subtitulos": "celeste",
+    "categoria": "educacion",
+    "videos_por_dia": 1,
+    "horarios": [
+      "18:00"
+    ],
+    "tags_base": [
+      "historia",
+      "historias reales"
+    ],
+    "canales_referencia": [],
+    "temas_semilla": [
+      "La Gran Inundación de Melaza de Boston",
+      "El emperador Norton de Estados Unidos",
+      "La guerra del emú en Australia"
+    ],
+    "canal_youtube": "principal"
+  },
+  {
+    "id": "tecnologia",
+    "nombre": "Tecnología",
+    "descripcion": "Gadgets, IA y apps explicadas sin humo",
+    "activo": true,
+    "formato": "short",
+    "formato_clips": "short",
+    "tono": "directo, escéptico, práctico",
+    "voz": "es-MX-DaliaNeural",
+    "velocidad_voz": "+5%",
+    "color_subtitulos": "verde",
+    "categoria": "tecnologia",
+    "videos_por_dia": 2,
+    "horarios": [
+      "10:00",
+      "21:00"
+    ],
+    "tags_base": [
+      "tecnologia",
+      "tech"
+    ],
+    "canales_referencia": [],
+    "temas_semilla": [
+      "Por qué tu celular se calienta al cargar",
+      "Qué es realmente la nube"
+    ],
+    "canal_youtube": "principal"
+  },
+  {
+    "id": "clips_streams",
+    "nombre": "Clips de streams",
+    "descripcion": "Momentos graciosos y anécdotas de streamers que permiten clips",
+    "activo": true,
+    "formato": "short",
+    "formato_clips": "short",
+    "tono": "rápido, gracioso",
+    "voz": "es-MX-JorgeNeural",
+    "velocidad_voz": "+8%",
+    "color_subtitulos": "rosa",
+    "categoria": "entretenimiento",
+    "videos_por_dia": 3,
+    "horarios": [
+      "13:00",
+      "17:00",
+      "22:00"
+    ],
+    "tags_base": [
+      "clips",
+      "stream",
+      "momentos graciosos"
+    ],
+    "clips_por_video": 3,
+    "puntaje_min_clip": 4,
+    "clip_intro_narrada": true,
+    "reencuadre": "desenfoque",
+    "canales_referencia": [],
+    "temas_semilla": [],
+    "canal_youtube": "principal"
+  },
+  {
+    "id": "misterios",
+    "nombre": "Misterios sin resolver",
+    "descripcion": "Casos raros, desapariciones y enigmas con fuentes verificables",
+    "activo": false,
+    "formato": "largo",
+    "formato_clips": "short",
+    "tono": "pausado, intrigante, sin sensacionalismo",
+    "voz": "es-MX-JorgeNeural",
+    "velocidad_voz": "-2%",
+    "color_subtitulos": "celeste",
+    "categoria": "entretenimiento",
+    "videos_por_dia": 1,
+    "horarios": [
+      "22:00"
+    ],
+    "tags_base": [
+      "misterios",
+      "casos sin resolver"
+    ],
+    "canales_referencia": [],
+    "temas_semilla": [
+      "El incidente del Paso Diátlov",
+      "La señal Wow!"
+    ],
+    "canal_youtube": "principal"
+  }
+]

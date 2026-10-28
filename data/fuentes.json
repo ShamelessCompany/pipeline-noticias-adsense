@@ -1,0 +1,22 @@
+[
+  {
+    "nombre": "Ejemplo: streamer que permite clips",
+    "url": "https://www.twitch.tv/NOMBRE_DEL_CANAL/videos",
+    "plataforma": "twitch",
+    "nicho": "clips_streams",
+    "uso": "clips",
+    "permite_clips": false,
+    "activa": false,
+    "notas": "Cambia la URL, confirma que el creador permite clips (en su panel, descripción o por mensaje) y marca permite_clips."
+  },
+  {
+    "nombre": "Ejemplo: canal de referencia de curiosidades",
+    "url": "https://www.youtube.com/@CANAL_DE_REFERENCIA",
+    "plataforma": "youtube",
+    "nicho": "curiosidades",
+    "uso": "referencia",
+    "permite_clips": false,
+    "activa": false,
+    "notas": "Solo inspira temas: el guion se escribe de cero y se comprueba que no copie frases."
+  }
+]
