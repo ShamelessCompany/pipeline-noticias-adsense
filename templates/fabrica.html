@@ -1,0 +1,1022 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fábrica de Contenido</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0c0e12; --panel:#13161c; --panel2:#191d25; --line:#252a35; --line2:#323947;
+  --text:#eef0f4; --muted:#8b93a3; --dim:#5d6575;
+  --accent:#ff7a45; --accent2:#ffb38f; --ok:#3ecf8e; --warn:#f5b84b; --bad:#f2555a; --info:#5aa9ff;
+  --r:14px; --font:'Manrope',system-ui,-apple-system,Segoe UI,sans-serif; --mono:'IBM Plex Mono',ui-monospace,Consolas,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--text);font:14px/1.5 var(--font);display:flex;overflow:hidden}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--accent2)}
+/* ---- barra lateral ---- */
+nav{width:228px;flex-shrink:0;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:18px 12px}
+.marca{display:flex;align-items:center;gap:10px;padding:4px 8px 22px}
+.marca .logo{width:34px;height:34px;border-radius:10px;background:conic-gradient(from 210deg,var(--accent),#ffcf6b,var(--accent));display:grid;place-items:center;font-weight:800;color:#1a0d06}
+.marca b{display:block;font-size:15px;letter-spacing:-.01em}
+.marca span{font-size:11.5px;color:var(--muted)}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;color:var(--muted);cursor:pointer;font-weight:600;border:0;background:none;width:100%;text-align:left}
+.nav-item:hover{background:var(--panel2);color:var(--text)}
+.nav-item.on{background:rgba(255,122,69,.12);color:var(--accent2)}
+.nav-item svg{width:18px;height:18px;flex-shrink:0}
+.nav-item .badge{margin-left:auto;background:var(--accent);color:#1a0d06;border-radius:99px;font-size:11px;padding:0 7px;font-weight:800}
+.nav-sep{height:1px;background:var(--line);margin:12px 6px}
+.nav-pie{margin-top:auto;font-size:11.5px;color:var(--dim);padding:8px}
+/* ---- contenido ---- */
+main{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{display:flex;align-items:center;gap:14px;padding:14px 26px;border-bottom:1px solid var(--line);background:rgba(12,14,18,.85);backdrop-filter:blur(8px)}
+.top h1{font-size:19px;letter-spacing:-.02em;margin-right:auto}
+.vista{flex:1;overflow:auto;padding:24px 26px 60px}
+.oculto{display:none!important}
+/* interruptores */
+.switch{display:flex;align-items:center;gap:9px;cursor:pointer;user-select:none;font-weight:600;font-size:13px;color:var(--muted)}
+.switch input{display:none}
+.switch i{width:38px;height:22px;border-radius:99px;background:var(--line2);position:relative;transition:.2s}
+.switch i::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.2s}
+.switch input:checked+i{background:var(--ok)}
+.switch input:checked+i::after{left:19px}
+.switch input:checked~span{color:var(--text)}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:99px;font-size:11.5px;font-weight:700;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
+.chip.ok{color:var(--ok);border-color:rgba(62,207,142,.3);background:rgba(62,207,142,.08)}
+.chip.warn{color:var(--warn);border-color:rgba(245,184,75,.3);background:rgba(245,184,75,.08)}
+.chip.bad{color:var(--bad);border-color:rgba(242,85,90,.3);background:rgba(242,85,90,.08)}
+.chip.info{color:var(--info);border-color:rgba(90,169,255,.3);background:rgba(90,169,255,.08)}
+.chip.acc{color:var(--accent2);border-color:rgba(255,122,69,.35);background:rgba(255,122,69,.1)}
+.btn{text-decoration:none;color:var(--text);border:1px solid var(--line2);background:var(--panel2);padding:8px 14px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13px}
+.btn:hover{border-color:var(--muted)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#1a0d06}
+.btn.pri:hover{background:#ff8f61}
+.btn.ok{background:var(--ok);border-color:var(--ok);color:#06150e}
+.btn.bad{color:var(--bad)}
+.btn.sm{padding:5px 10px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:default}
+/* tarjetas */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:14px;font-weight:700}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(5,1fr)}
+.kpi{padding:16px 18px}
+.kpi .n{font-size:30px;font-weight:800;letter-spacing:-.03em;line-height:1.1}
+.kpi .l{color:var(--muted);font-size:12.5px;font-weight:600}
+.sala{grid-template-columns:minmax(0,1fr) 380px;margin-top:16px;align-items:start}
+.agentes{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.agente{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:14px;position:relative;min-height:118px;transition:border-color .3s}
+.agente.trabajando{border-color:rgba(255,122,69,.55);box-shadow:0 0 0 3px rgba(255,122,69,.07)}
+.agente.error{border-color:rgba(242,85,90,.5)}
+.agente .cab{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.avatar{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;font-weight:800;font-size:14px;background:var(--line);color:var(--text)}
+.agente.trabajando .avatar{background:var(--accent);color:#1a0d06}
+.agente .nom{font-weight:800;font-size:14px}
+.agente .rol{font-size:11.5px;color:var(--muted);line-height:1.35}
+.agente .tarea{margin-top:8px;font-size:12.5px;color:var(--text);min-height:18px;padding-bottom:14px}
+.agente .tarea.idle{color:var(--dim)}
+.punto{width:8px;height:8px;border-radius:50%;background:var(--dim);position:absolute;top:16px;right:14px}
+.agente.trabajando .punto{background:var(--accent);animation:pulso 1.2s infinite}
+.agente.error .punto{background:var(--bad)}
+@keyframes pulso{0%{box-shadow:0 0 0 0 rgba(255,122,69,.6)}100%{box-shadow:0 0 0 9px rgba(255,122,69,0)}}
+.hechos{position:absolute;right:14px;bottom:10px;font-size:11px;color:var(--dim);font-family:var(--mono)}
+.feed{max-height:calc(100vh - 290px);overflow:auto;margin:-4px -6px 0;padding:0 6px}
+.ev{display:grid;grid-template-columns:44px 1fr;gap:8px;padding:8px 0;border-bottom:1px dashed var(--line);font-size:12.5px}
+.ev:last-child{border:0}
+.ev time{font-family:var(--mono);color:var(--dim);font-size:11px;padding-top:2px}
+.ev b{font-weight:700;color:var(--accent2);margin-right:5px}
+.ev.error b{color:var(--bad)} .ev.aviso b{color:var(--warn)} .ev.ok b{color:var(--ok)}
+.ev .lnk{color:var(--info);cursor:pointer;font-family:var(--mono);font-size:11px}
+.curso{margin-top:16px}
+.barra{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-top:8px}
+.barra i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),#ffcf6b);border-radius:99px;transition:width .5s}
+.fila-curso{display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.fila-curso:last-child{border:0}
+.vacio{color:var(--dim);font-size:13px;padding:18px 0;text-align:center}
+/* producción */
+.kanban{display:grid;grid-template-columns:repeat(7,minmax(170px,1fr));gap:12px;overflow-x:auto;padding-bottom:10px}
+.col{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px;min-height:300px}
+.col h4{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);display:flex;justify-content:space-between;margin-bottom:10px}
+.tj{background:var(--panel2);border:1px solid var(--line);border-radius:11px;padding:10px;margin-bottom:9px;cursor:pointer;display:flex;gap:10px}
+.tj:hover{border-color:var(--line2)}
+.tj img,.tj .ph{width:44px;height:62px;object-fit:cover;border-radius:7px;background:var(--line);flex-shrink:0}
+.tj .ph{display:grid;place-items:center;color:var(--dim);font-size:18px}
+.tj .t{font-weight:700;font-size:12.5px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tj .m{display:flex;gap:5px;flex-wrap:wrap;margin-top:6px}
+.tj .m .chip{font-size:10.5px;padding:1px 7px}
+.tj .e{font-size:11.5px;color:var(--muted);margin-top:5px}
+/* revisión */
+.rev{display:grid;grid-template-columns:260px minmax(0,1fr);gap:16px;align-items:start}
+.rev-lista .it{padding:10px;border-radius:10px;cursor:pointer;border:1px solid transparent;display:flex;gap:10px;align-items:center}
+.rev-lista .it:hover{background:var(--panel2)}
+.rev-lista .it.on{background:var(--panel2);border-color:var(--line2)}
+.rev-lista img{width:36px;height:50px;object-fit:cover;border-radius:6px;background:var(--line)}
+.rev-det{display:grid;grid-template-columns:minmax(260px,340px) minmax(0,1fr);gap:18px;align-items:start}
+.rev-det.horizontal{grid-template-columns:1fr}
+video{width:100%;border-radius:12px;background:#000;display:block}
+label.campo{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:14px 0 6px}
+input.in,select.in,textarea.in{width:100%;background:var(--bg);border:1px solid var(--line2);border-radius:9px;padding:9px 11px;outline:none}
+input.in:focus,select.in:focus,textarea.in:focus{border-color:var(--accent)}
+textarea.in{resize:vertical;min-height:90px;line-height:1.5}
+.cumple{display:flex;gap:16px;align-items:center;margin-bottom:12px}
+.anillo{--p:0;width:74px;height:74px;border-radius:50%;background:conic-gradient(var(--c,var(--ok)) calc(var(--p)*1%),var(--line) 0);display:grid;place-items:center;flex-shrink:0}
+.anillo b{width:58px;height:58px;border-radius:50%;background:var(--panel);display:grid;place-items:center;font-size:19px;font-weight:800}
+.check{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px}
+.check:last-child{border:0}
+.check .ic{width:20px;height:20px;border-radius:6px;display:grid;place-items:center;font-size:12px;font-weight:800}
+.check.si .ic{background:rgba(62,207,142,.15);color:var(--ok)}
+.check.no .ic{background:rgba(245,184,75,.15);color:var(--warn)}
+.check.blq .ic{background:rgba(242,85,90,.15);color:var(--bad)}
+.check small{display:block;color:var(--muted);font-size:12px}
+.acciones{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+.texto-largo{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:13px;max-height:220px;overflow:auto;white-space:pre-wrap;color:#cfd4dd}
+mark{background:rgba(242,85,90,.22);color:#ffd0d2;border-radius:3px;padding:0 2px}
+.aviso-blq{background:rgba(242,85,90,.08);border:1px solid rgba(242,85,90,.35);color:#ffc1c3;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+/* formularios */
+.dos{grid-template-columns:1fr 1fr}
+.tres{grid-template-columns:repeat(3,1fr)}
+.hint{font-size:12px;color:var(--dim);margin-top:6px}
+.chk{display:flex;gap:9px;align-items:flex-start;margin-top:14px;font-size:13px;cursor:pointer}
+.chk input{margin-top:3px;accent-color:var(--accent)}
+.nicho{padding:0;overflow:hidden}
+.nicho .cab{display:flex;align-items:center;gap:12px;padding:14px 18px;border-bottom:1px solid var(--line)}
+.nicho .cab b{font-size:15px}
+.nicho .cuerpo{padding:4px 18px 18px}
+.nicho .estilo{background:var(--panel2);border-radius:10px;padding:12px;margin-top:14px;font-size:12.5px}
+.nicho .estilo ul{padding-left:18px;color:#cfd4dd}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);padding:8px;border-bottom:1px solid var(--line)}
+td{padding:6px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td input.in,td select.in{padding:6px 8px}
+.prov{display:grid;grid-template-columns:110px 1fr 90px;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.lab{grid-template-columns:1fr 1fr}
+.bib-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.rec{background:var(--panel2);border:1px solid var(--line);border-radius:11px;overflow:hidden;display:flex;flex-direction:column}
+.rec .vis{aspect-ratio:16/10;background:var(--bg);display:grid;place-items:center;color:var(--dim);font-size:22px;overflow:hidden}
+.rec .vis img,.rec .vis video{width:100%;height:100%;object-fit:cover;border-radius:0}
+.rec .inf{padding:8px 10px;font-size:12px;display:flex;flex-direction:column;gap:5px;flex:1}
+.rec .inf .et{color:#cfd4dd;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.rec .inf .pie{display:flex;gap:4px;flex-wrap:wrap;align-items:center;margin-top:auto}
+.rec .inf .chip{font-size:10.5px;padding:1px 7px}
+.linea-t{display:grid;grid-template-columns:52px 82px 1fr;gap:8px;padding:6px 0;border-bottom:1px solid var(--line);font-size:12.5px;align-items:baseline}
+.linea-t:last-child{border:0}
+.linea-t .chip{justify-self:start}
+.linea-t time{font-family:var(--mono);color:var(--dim);font-size:11px}
+.receta{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;margin:8px 0}
+.receta div{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 9px}
+.receta b{display:block;font-size:16px}
+.receta span{font-size:11px;color:var(--muted)}
+.metr{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+/* panel lateral de detalle */
+.cajon{position:fixed;top:0;right:0;bottom:0;width:min(560px,100vw);background:var(--panel);border-left:1px solid var(--line2);box-shadow:-20px 0 40px rgba(0,0,0,.4);transform:translateX(105%);transition:transform .25s;z-index:20;display:flex;flex-direction:column}
+.cajon.abierto{transform:none}
+.cajon .cab{display:flex;align-items:center;gap:10px;padding:16px 20px;border-bottom:1px solid var(--line)}
+.cajon .cab h2{font-size:16px;margin-right:auto;line-height:1.3}
+.cajon .cuerpo{overflow:auto;padding:18px 20px;flex:1}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line2);padding:10px 16px;border-radius:10px;font-weight:600;z-index:30;opacity:0;transition:.25s;pointer-events:none}
+.toast.ver{opacity:1}
+/* whop */
+.whop{display:grid;grid-template-columns:290px minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.whop .kpis{margin:0}
+.camp{padding:11px 12px;border-radius:11px;cursor:pointer;border:1px solid transparent;margin-bottom:6px}
+.camp:hover{background:var(--panel2)}
+.camp.on{background:var(--panel2);border-color:var(--line2)}
+.camp b{display:block;font-size:13.5px;line-height:1.3}
+.camp .m{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.camp .m .chip{font-size:10.5px;padding:1px 7px}
+.flujo{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
+.flujo div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;position:relative}
+.flujo div.act{border-color:rgba(255,122,69,.5)}
+.flujo b{display:block;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.flujo span{font-size:11px;color:var(--muted);font-weight:600}
+.reglas{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.subir{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.subir:last-child{border:0}
+.subir video{max-height:260px}
+.subir.h{grid-template-columns:260px minmax(0,1fr)}
+.cap{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:start;margin-top:8px}
+.cap pre{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 9px;font:12px/1.45 var(--font);white-space:pre-wrap;max-height:96px;overflow:auto;color:#cfd4dd}
+.cap b{font-size:12px;color:var(--muted);padding-top:7px}
+.envio{display:flex;gap:8px;margin-top:10px}
+.envio select.in{width:150px;flex-shrink:0}
+td .in.num{width:90px}
+@media (max-width:1100px){.whop,.subir,.subir.h{grid-template-columns:minmax(0,1fr)}.flujo{grid-template-columns:repeat(3,1fr)}.cap{grid-template-columns:1fr}}
+@media (max-width:1100px){.sala{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.rev,.rev-det,.dos,.tres,.lab{grid-template-columns:1fr}}
+@media (max-width:760px){nav{width:62px;padding:14px 8px}.marca div,.nav-item span,.nav-pie{display:none}.top{flex-wrap:wrap;padding:12px 16px}.vista{padding:16px}.kpis{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<nav>
+  <div class="marca"><div class="logo">F</div><div><b>Fábrica</b><span>de contenido · local</span></div></div>
+  <button class="nav-item on" data-v="sala"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Sala de control</span></button>
+  <button class="nav-item" data-v="produccion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h4v14H4zM10 5h4v9h-4zM16 5h4v6h-4z"/></svg><span>Producción</span></button>
+  <button class="nav-item" data-v="revision"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>Revisión</span><em class="badge oculto" id="badge-rev">0</em></button>
+  <button class="nav-item" data-v="nuevo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span>Nuevo trabajo</span></button>
+  <button class="nav-item" data-v="whop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l6 6 6-6M6 20l6-6 6 6"/><circle cx="12" cy="12" r="2"/></svg><span>Whop</span><em class="badge oculto" id="badge-whop">0</em></button>
+  <div class="nav-sep"></div>
+  <button class="nav-item" data-v="nichos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Nichos</span></button>
+  <button class="nav-item" data-v="biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/></svg><span>Biblioteca</span></button>
+  <button class="nav-item" data-v="fuentes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16v12H4zM8 20h8M12 16v4"/></svg><span>Fuentes</span></button>
+  <button class="nav-item" data-v="laboratorio"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3h6M10 3v6L4 19a1.5 1.5 0 0 0 1.3 2h13.4a1.5 1.5 0 0 0 1.3-2L14 9V3"/></svg><span>Laboratorio de guion</span></button>
+  <button class="nav-item" data-v="ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span>Ajustes</span></button>
+  <div class="nav-pie">Modelo: <span id="pie-llm">—</span><br>Publicación: <span id="pie-pub">—</span></div>
+</nav>
+
+<main>
+  <div class="top">
+    <h1 id="titulo-vista">Sala de control</h1>
+    <label class="switch" title="Procesa la cola de trabajos"><input type="checkbox" id="sw-trabajador"><i></i><span>Trabajador</span></label>
+    <label class="switch" title="El Explorador busca material solo cada cierto tiempo"><input type="checkbox" id="sw-piloto"><i></i><span>Piloto automático</span></label>
+    <button class="btn" id="btn-ciclo">Buscar material ahora</button>
+  </div>
+
+  <!-- SALA DE CONTROL -->
+  <section class="vista" id="v-sala">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="n" id="k-cola">0</div><div class="l">En cola</div></div>
+      <div class="card kpi"><div class="n" id="k-proc">0</div><div class="l">Produciendo ahora</div></div>
+      <div class="card kpi"><div class="n" id="k-rev" style="color:var(--accent2)">0</div><div class="l">Esperan tu revisión</div></div>
+      <div class="card kpi"><div class="n" id="k-prog">0</div><div class="l">Programados</div></div>
+      <div class="card kpi"><div class="n" id="k-pub" style="color:var(--ok)">0</div><div class="l">Publicados</div></div>
+    </div>
+    <div class="grid sala">
+      <div>
+        <div class="card"><h3>El equipo</h3><div class="agentes" id="agentes"></div></div>
+        <div class="card curso"><h3>En producción ahora</h3><div id="en-curso"><div class="vacio">Nadie está produciendo. Enciende el trabajador o crea un trabajo.</div></div></div>
+      </div>
+      <div class="card"><h3>Bitácora en vivo</h3><div class="feed" id="feed"></div></div>
+    </div>
+  </section>
+
+  <!-- PRODUCCIÓN -->
+  <section class="vista oculto" id="v-produccion">
+    <div class="kanban" id="kanban"></div>
+  </section>
+
+  <!-- REVISIÓN -->
+  <section class="vista oculto" id="v-revision">
+    <div class="rev">
+      <div class="card rev-lista"><h3>Para revisar</h3><div id="rev-lista"></div></div>
+      <div class="card" id="rev-det"><div class="vacio">Cuando un agente termine una pieza aparecerá aquí para que la apruebes, la edites o la mandes a rehacer.</div></div>
+    </div>
+  </section>
+
+  <!-- NUEVO -->
+  <section class="vista oculto" id="v-nuevo">
+    <div class="grid dos">
+      <div class="card">
+        <h3>Sacar clips de un video o VOD</h3>
+        <p class="hint" style="margin:0 0 4px">El Clipper baja el video, escucha dónde hay risas o reacciones, lee la transcripción y corta los mejores momentos.</p>
+        <label class="campo">URL de YouTube o Twitch (o ruta a un archivo local)</label>
+        <input class="in" id="n-clip-url" placeholder="https://www.twitch.tv/videos/...">
+        <div class="grid dos" style="gap:12px">
+          <div><label class="campo">Nicho</label><select class="in sel-nicho" id="n-clip-nicho"></select></div>
+          <div><label class="campo">Formato</label><select class="in" id="n-clip-fmt"><option value="short">Short vertical 9:16</option><option value="largo">Horizontal 16:9</option></select></div>
+        </div>
+        <label class="chk"><input type="checkbox" id="n-clip-permiso"><span>Tengo permiso del creador para publicar clips de este canal. <span class="hint">Sin permiso el Revisor lo bloquea: hay riesgo de reclamos de copyright y de perder la monetización.</span></span></label>
+        <div class="acciones"><button class="btn pri" id="n-clip-ok">Mandar al Clipper</button></div>
+      </div>
+      <div class="card">
+        <h3>Video original</h3>
+        <p class="hint" style="margin:0 0 4px">El Guionista investiga, escribe un guion propio con el estilo del nicho, lo limpia de muletillas de IA, y el Editor lo monta con B-roll libre.</p>
+        <label class="campo">Tema</label>
+        <input class="in" id="n-ori-tema" placeholder="Por qué los gatos siempre caen de pie">
+        <label class="campo">o un video de referencia (solo inspira el tema; no se copia)</label>
+        <input class="in" id="n-ori-url" placeholder="https://www.youtube.com/watch?v=...">
+        <div class="grid dos" style="gap:12px">
+          <div><label class="campo">Nicho</label><select class="in sel-nicho" id="n-ori-nicho"></select></div>
+          <div><label class="campo">Formato</label><select class="in" id="n-ori-fmt"><option value="short">Short vertical (≈45 s)</option><option value="largo">Largo horizontal (5-10 min)</option></select></div>
+        </div>
+        <label class="campo">Indicaciones para el guionista (opcional)</label>
+        <textarea class="in" id="n-ori-ins" placeholder="Enfócate en el dato menos conocido. Cierra con una pregunta."></textarea>
+        <div class="acciones"><button class="btn pri" id="n-ori-ok">Mandar al Guionista</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHOP -->
+  <section class="vista oculto" id="v-whop">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="n" id="w-k-act">0</div><div class="l">Campañas activas</div></div>
+      <div class="card kpi"><div class="n" id="w-k-rev">0</div><div class="l">Clips para revisar</div></div>
+      <div class="card kpi"><div class="n" id="w-k-sub">0</div><div class="l">Listos para subir</div></div>
+      <div class="card kpi"><div class="n" id="w-k-vis">0</div><div class="l">Vistas de los enlaces</div></div>
+      <div class="card kpi"><div class="n" id="w-k-gan">$0</div><div class="l">Estimado a cobrar</div></div>
+    </div>
+    <div class="whop">
+      <div class="card">
+        <h3 style="display:flex;align-items:center">Campañas<button class="btn sm pri" style="margin-left:auto" onclick="formCampana()">+ Nueva</button></h3>
+        <div id="w-lista"></div>
+      </div>
+      <div class="card" id="w-det"><div class="vacio">Registra una campaña de Whop: pega sus reglas, los enlaces del material y el bot saca los clips siguiendo esas reglas.</div></div>
+    </div>
+  </section>
+
+  <!-- NICHOS -->
+  <section class="vista oculto" id="v-nichos">
+    <div style="display:flex;gap:10px;margin-bottom:16px"><button class="btn" id="nicho-add">+ Añadir nicho</button><button class="btn pri" id="nichos-save">Guardar nichos</button></div>
+    <div class="grid dos" id="nichos"></div>
+  </section>
+
+  <!-- BIBLIOTECA -->
+  <section class="vista oculto" id="v-biblioteca">
+    <div class="grid dos" style="margin-bottom:16px">
+      <div class="card">
+        <h3>Qué hay</h3>
+        <div class="receta" id="bib-stats"></div>
+        <p class="hint" id="bib-sem"></p>
+        <p class="hint">El Editor busca aquí primero. Lo que baja de Pexels, Pixabay, Openverse, Wikimedia y NASA se guarda solo, con su licencia y su autor, para reutilizarlo. Solo se aceptan licencias que permiten uso comercial y modificar (nada de NC ni ND).</p>
+      </div>
+      <div class="card">
+        <h3>Añadir material propio o libre</h3>
+        <input class="in" type="file" id="bib-archivo" accept="video/*,image/*,audio/*">
+        <div class="grid dos" style="gap:0 12px">
+          <div><label class="campo">Licencia</label><select class="in" id="bib-lic">
+            <option value="propio">Propio (lo hice yo)</option><option value="cc0">CC0</option><option value="pdm">Dominio público</option>
+            <option value="cc-by">CC BY (pide crédito)</option><option value="cc-by-sa">CC BY-SA (pide crédito)</option>
+            <option value="pexels">Licencia Pexels</option><option value="pixabay">Licencia Pixabay</option><option value="nasa">NASA</option></select></div>
+          <div><label class="campo">Autor / crédito</label><input class="in" id="bib-cred" placeholder="Nombre del autor"></div>
+          <div style="grid-column:1/-1"><label class="campo">Qué se ve (palabras para encontrarlo)</label><input class="in" id="bib-et" placeholder="torre eiffel de noche, parís, francia"></div>
+          <div><label class="campo">Nicho (opcional)</label><select class="in sel-nicho-op" id="bib-nicho"></select></div>
+          <div><label class="campo">Enlace al original</label><input class="in" id="bib-url" placeholder="https://..."></div>
+        </div>
+        <div class="acciones"><button class="btn pri" id="bib-subir">Añadir a la biblioteca</button></div>
+      </div>
+    </div>
+    <div class="card">
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:14px;flex-wrap:wrap">
+        <input class="in" id="bib-q" placeholder="Prueba una búsqueda como la haría el Editor: «científico en un laboratorio»" style="flex:1;min-width:220px">
+        <select class="in" id="bib-tipo" style="width:150px"><option value="">Todo</option><option value="video">Videos</option><option value="imagen">Imágenes</option><option value="audio">Audio</option></select>
+        <button class="btn" id="bib-buscar">Buscar</button>
+      </div>
+      <div class="bib-grid" id="bib-grid"></div>
+    </div>
+  </section>
+
+  <!-- FUENTES -->
+  <section class="vista oculto" id="v-fuentes">
+    <div class="card">
+      <h3>Canales que vigila el Explorador</h3>
+      <p class="hint" style="margin:-6px 0 12px">«Clips» = se recortan momentos (solo si el creador lo permite). «Referencia» = sus videos más vistos inspiran originales y enseñan el estilo.</p>
+      <div style="overflow-x:auto"><table><thead><tr><th>Activa</th><th>Nombre</th><th>URL del canal</th><th>Nicho</th><th>Uso</th><th>Permite clips</th><th></th></tr></thead><tbody id="fuentes"></tbody></table></div>
+      <div class="acciones"><button class="btn" id="fuente-add">+ Añadir fuente</button><button class="btn pri" id="fuentes-save">Guardar fuentes</button></div>
+    </div>
+  </section>
+
+  <!-- LABORATORIO -->
+  <section class="vista oculto" id="v-laboratorio">
+    <div class="grid lab">
+      <div class="card">
+        <h3>Texto a revisar</h3>
+        <textarea class="in" id="lab-in" style="min-height:300px" placeholder="Pega aquí un guion. Te digo qué suena a IA y te propongo una versión más humana."></textarea>
+        <div class="acciones"><button class="btn" id="lab-medir">Solo medir</button><button class="btn pri" id="lab-ok">Medir y reescribir</button></div>
+      </div>
+      <div class="card"><h3>Resultado</h3><div id="lab-out"><div class="vacio">Aquí verás el puntaje de escritura humana, lo que delata a la IA y la versión limpia.</div></div></div>
+    </div>
+  </section>
+
+  <!-- AJUSTES -->
+  <section class="vista oculto" id="v-ajustes">
+    <div class="grid dos">
+      <div class="card">
+        <h3>Claves gratuitas</h3>
+        <label class="campo">Gemini (Google AI Studio)</label><input class="in clave" data-k="GEMINI_API_KEY" placeholder="AIza...">
+        <label class="campo">OpenCode Zen (modelos gratis)</label><input class="in clave" data-k="OPENCODE_API_KEY">
+        <label class="campo">Pexels (B-roll en video)</label><input class="in clave" data-k="PEXELS_API_KEY">
+        <label class="campo">Pixabay (B-roll en video)</label><input class="in clave" data-k="PIXABAY_API_KEY">
+        <p class="hint">Se guardan en el archivo .env de tu carpeta. No salen de tu máquina.</p>
+        <div class="acciones"><button class="btn pri" id="claves-save">Guardar claves</button></div>
+      </div>
+      <div class="card">
+        <h3>Modelos de lenguaje</h3>
+        <label class="campo">Orden de uso (el primero que responda)</label>
+        <input class="in" id="aj-orden" placeholder="gemini, opencode, ollama, local">
+        <div class="grid tres" style="gap:12px">
+          <div><label class="campo">Modelo Gemini</label><input class="in" id="aj-gem"></div>
+          <div><label class="campo">Modelo OpenCode</label><input class="in" id="aj-oc" placeholder="nombre del modelo gratis"></div>
+          <div><label class="campo">Modelo Ollama</label><input class="in" id="aj-oll"></div>
+        </div>
+        <div id="prov-res" style="margin-top:12px"></div>
+        <div class="acciones"><button class="btn" id="llm-test">Probar conexión</button></div>
+      </div>
+      <div class="card">
+        <h3>Canales de YouTube conectados</h3>
+        <div id="canales"></div>
+        <p class="hint">Para conectar uno, en la VPS: <code>python fabrica.py conectar-canal ALIAS</code> con el túnel SSH del puerto 8765 abierto (ver deploy/azure/README_AZURE.md). Luego escribe ese alias en el campo «Canal de YouTube» del nicho.</p>
+      </div>
+      <div class="card">
+        <h3>Producción y publicación</h3>
+        <label class="chk"><input type="checkbox" id="aj-manual"><span><b>Aprobación manual</b><br><span class="hint">Una persona aprueba cada pieza antes de publicar. Recomendado: YouTube pide supervisión humana real en canales automatizados.</span></span></label>
+        <div class="grid dos" style="gap:12px">
+          <div><label class="campo">Umbral de autoaprobación</label><input class="in" type="number" id="aj-umbral" min="0" max="100"></div>
+          <div><label class="campo">Buscar material cada (min)</label><input class="in" type="number" id="aj-intervalo" min="5"></div>
+          <div><label class="campo">Máx. trabajos por ciclo</label><input class="in" type="number" id="aj-max" min="1"></div>
+          <div><label class="campo">Modelo Whisper</label><select class="in" id="aj-whisper"><option>tiny</option><option>base</option><option>small</option><option>medium</option></select></div>
+          <div><label class="campo">Publicación</label><select class="in" id="aj-modo"><option value="simulado">Simulada (no sube nada)</option><option value="real">Real (YouTube API)</option></select></div>
+          <div><label class="campo">Privacidad al subir</label><select class="in" id="aj-priv"><option value="private">Privado</option><option value="unlisted">Oculto</option><option value="public">Público</option></select></div>
+        </div>
+        <div class="acciones"><button class="btn pri" id="aj-save">Guardar ajustes</button></div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<aside class="cajon" id="cajon"><div class="cab"><h2 id="cajon-tit">Trabajo</h2><button class="btn sm" id="cajon-x">Cerrar</button></div><div class="cuerpo" id="cajon-cuerpo"></div></aside>
+<div class="toast" id="toast"></div>
+
+<script>
+const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+const api = async (url, opt={}) => {
+  const r = await fetch(url, {headers:{'Content-Type':'application/json'}, ...opt, body: opt.body ? JSON.stringify(opt.body) : undefined});
+  const j = await r.json().catch(()=>({}));
+  if (!r.ok) throw new Error(j.error || r.statusText);
+  return j;
+};
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const toast = m => { const t=$('#toast'); t.textContent=m; t.classList.add('ver'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('ver'),2600); };
+const hora = iso => { try { return new Date(iso).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}); } catch { return ''; } };
+const fecha = iso => { try { return new Date(iso).toLocaleString('es',{weekday:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}); } catch { return iso; } };
+const TIPOS = {fuente_clip:'VOD', clip:'Clip', original:'Original'};
+const ESTADO_CHIP = {en_cola:'', procesando:'acc', analizado:'info', revision:'warn', aprobado:'ok', programado:'ok', publicado:'ok', rechazado:'bad', error:'bad', descartado:''};
+const ESTADO_TXT = {en_cola:'En cola', procesando:'Produciendo', analizado:'Analizado', revision:'Para revisar', aprobado:'Aprobado', programado:'Programado', publicado:'Publicado', rechazado:'Rechazado', error:'Error', descartado:'Descartado'};
+let NICHOS = [], vista = 'sala', ultimoEvento = 0, revSel = null, revCampana = false;
+
+// ---------- navegación ----------
+const TITULOS = {sala:'Sala de control', produccion:'Producción', revision:'Revisión', nuevo:'Nuevo trabajo', whop:'Whop · campañas de clipping', nichos:'Nichos', biblioteca:'Biblioteca', fuentes:'Fuentes', laboratorio:'Laboratorio de guion', ajustes:'Ajustes'};
+function ir(v){
+  vista = v;
+  $$('.nav-item').forEach(b => b.classList.toggle('on', b.dataset.v === v));
+  $$('.vista').forEach(s => s.classList.toggle('oculto', s.id !== 'v-' + v));
+  $('#titulo-vista').textContent = TITULOS[v];
+  ({produccion: cargarKanban, revision: cargarRevision, nichos: cargarNichos, biblioteca: cargarBiblioteca, fuentes: cargarFuentes, ajustes: cargarAjustes, nuevo: llenarSelects, whop: cargarWhop})[v]?.();
+  try { localStorage.setItem('fabrica.vista', v); } catch {}
+}
+$$('.nav-item').forEach(b => b.onclick = () => ir(b.dataset.v));
+
+// ---------- estado en vivo ----------
+async function refrescar(){
+  try {
+    const e = await api('/api/estado');
+    const c = e.conteos;
+    $('#k-cola').textContent = c.en_cola; $('#k-proc').textContent = c.procesando;
+    $('#k-rev').textContent = c.revision; $('#k-prog').textContent = c.programado + c.aprobado; $('#k-pub').textContent = c.publicado;
+    const b = $('#badge-rev'); b.textContent = c.revision; b.classList.toggle('oculto', !c.revision);
+    const bw = $('#badge-whop'); bw.textContent = e.whop_listos; bw.classList.toggle('oculto', !e.whop_listos);
+    $('#sw-trabajador').checked = e.trabajador; $('#sw-piloto').checked = !!e.piloto_automatico;
+    $('#pie-llm').textContent = e.llm.nombre; $('#pie-pub').textContent = e.modo_publicacion;
+    pintarAgentes(e.agentes);
+    $('#en-curso').innerHTML = e.en_curso.length ? e.en_curso.map(t => `
+      <div class="fila-curso">${t.miniatura ? `<img src="${t.miniatura}" style="width:40px;height:56px;border-radius:6px;object-fit:cover">` : ''}
+        <div style="flex:1;min-width:0"><div style="font-weight:700;cursor:pointer" onclick="abrirTrabajo(${t.id})">#${t.id} · ${esc(t.titulo || 'Sin título')}</div>
+        <div class="hint" style="margin:2px 0 0">${TIPOS[t.tipo]} · ${esc(nombreNicho(t.nicho))} · ${esc(t.etapa)}</div>
+        <div class="barra"><i style="width:${t.progreso}%"></i></div></div></div>`).join('')
+      : '<div class="vacio">Nadie está produciendo. Enciende el trabajador o crea un trabajo.</div>';
+    const evs = await api('/api/eventos?desde=' + ultimoEvento);
+    if (evs.length){
+      ultimoEvento = evs[0].id;
+      const feed = $('#feed');
+      feed.insertAdjacentHTML('afterbegin', evs.map(ev => `<div class="ev ${ev.nivel}"><time>${hora(ev.fecha)}</time>
+        <div><b>${esc(ev.agente)}</b>${esc(ev.mensaje)} ${ev.trabajo_id ? `<span class="lnk" onclick="abrirTrabajo(${ev.trabajo_id})">#${ev.trabajo_id}</span>` : ''}</div></div>`).join(''));
+      while (feed.children.length > 250) feed.lastChild.remove();
+      if (vista === 'produccion') cargarKanban();
+      if (vista === 'revision') cargarRevision(true);
+      if (vista === 'whop') cargarWhop(true);
+    }
+  } catch (err) { console.warn(err); }
+}
+function pintarAgentes(ag){
+  $('#agentes').innerHTML = Object.entries(ag).map(([k, a]) => `
+    <div class="agente ${a.estado}"><span class="punto"></span>
+      <div class="cab"><div class="avatar">${esc(a.nombre[0])}</div><div><div class="nom">${esc(a.nombre)}</div></div></div>
+      <div class="rol">${esc(a.rol)}</div>
+      <div class="tarea ${a.estado === 'esperando' ? 'idle' : ''}">${a.estado === 'esperando' ? 'Esperando trabajo' : esc(a.tarea)}</div>
+      <span class="hechos">${a.hechos} hechos</span></div>`).join('');
+}
+$('#sw-trabajador').onchange = async e => { await api('/api/trabajador', {method:'POST', body:{encender:e.target.checked}}); toast(e.target.checked ? 'Trabajador encendido' : 'Trabajador apagado'); };
+$('#sw-piloto').onchange = async e => { await api('/api/ajustes', {method:'POST', body:{piloto_automatico:e.target.checked}}); toast(e.target.checked ? 'Piloto automático encendido' : 'Piloto automático apagado'); };
+$('#btn-ciclo').onclick = async () => { await api('/api/ciclo', {method:'POST'}); toast('El Explorador está buscando material'); };
+
+const nombreNicho = id => (NICHOS.find(n => n.id === id) || {}).nombre || id;
+
+// ---------- producción ----------
+const COLUMNAS = [['en_cola','En cola',['en_cola']], ['procesando','Produciendo',['procesando']], ['analizado','VODs analizados',['analizado']], ['revision','Para revisar',['revision']],
+                  ['programado','Aprobado / programado',['aprobado','programado']], ['publicado','Publicado',['publicado']], ['error','Error o rechazado',['error','rechazado']]];
+async function cargarKanban(){
+  const ts = await api('/api/trabajos');
+  $('#kanban').innerHTML = COLUMNAS.map(([k, tit, est]) => {
+    const items = ts.filter(t => est.includes(t.estado));
+    return `<div class="col"><h4>${tit}<span>${items.length}</span></h4>${items.map(tarjeta).join('') || '<div class="vacio">—</div>'}</div>`;
+  }).join('');
+}
+function tarjeta(t){
+  return `<div class="tj" onclick="abrirTrabajo(${t.id})">
+    ${t.miniatura ? `<img src="${t.miniatura}" loading="lazy">` : `<div class="ph">${t.tipo === 'original' ? '✎' : '✂'}</div>`}
+    <div style="min-width:0"><div class="t">${esc(t.titulo || 'Sin título')}</div>
+    <div class="m"><span class="chip">${TIPOS[t.tipo]}</span><span class="chip">${esc(nombreNicho(t.nicho))}</span>${t.puntaje ? `<span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span>` : ''}</div>
+    <div class="e">${t.estado === 'programado' ? 'Sale ' + fecha(t.programado_para) : esc(t.etapa || ESTADO_TXT[t.estado])}</div>
+    ${t.estado === 'procesando' ? `<div class="barra"><i style="width:${t.progreso}%"></i></div>` : ''}</div></div>`;
+}
+
+// ---------- detalle (cajón) ----------
+async function abrirTrabajo(id){
+  const t = await api('/api/trabajos/' + id);
+  $('#cajon-tit').textContent = `#${t.id} · ${t.titulo || 'Sin título'}`;
+  const d = t.datos;
+  let h = `<div class="metr"><span class="chip ${ESTADO_CHIP[t.estado]}">${ESTADO_TXT[t.estado]}</span><span class="chip">${TIPOS[t.tipo]}</span><span class="chip">${esc(nombreNicho(t.nicho))}</span><span class="chip">${t.formato === 'short' ? '9:16' : '16:9'}</span></div>`;
+  if (t.error) h += `<div class="aviso-blq">${esc(t.error)}</div>`;
+  if (t.video_url) h += `<video src="${t.video_url}" controls style="max-height:420px;margin-bottom:12px"></video>`;
+  if (t.fuente_url) h += `<label class="campo">Fuente</label><div class="hint" style="word-break:break-all">${esc(t.fuente_url)}</div>`;
+  if (t.tipo === 'fuente_clip' && d.candidatos) {
+    h += `<label class="campo">Momentos detectados</label>` + d.candidatos.map(c => `<div class="check ${c.puntaje >= 4 ? 'si' : 'no'}"><span class="ic">${Math.round(c.puntaje)}</span><div>${fmtSeg(c.inicio)} – ${fmtSeg(c.fin)} · ${esc(c.categoria || 'sin categoría')}<small>${esc(c.titulo || c.motivo || 'Detectado por energía del audio')}</small></div></div>`).join('');
+  }
+  if (t.hijos?.length) h += `<label class="campo">Clips creados</label>` + t.hijos.map(tarjeta).join('');
+  h += pintarMontaje(d);
+  if (d.guion) h += `<label class="campo">Guion</label><div class="texto-largo">${esc(d.guion)}</div>`;
+  if (d.transcripcion) h += `<label class="campo">Transcripción del momento</label><div class="texto-largo">${esc(d.transcripcion)}</div>`;
+  h += `<label class="campo">Historial</label>` + (t.eventos.map(ev => `<div class="ev ${ev.nivel}"><time>${hora(ev.fecha)}</time><div><b>${esc(ev.agente)}</b>${esc(ev.mensaje)}</div></div>`).join('') || '<div class="vacio">Sin eventos</div>');
+  h += `<div class="acciones">${t.estado === 'revision' ? `<button class="btn pri" onclick="ir('revision');selRev(${t.id})">Ir a revisar</button>` : ''}
+        ${['error','rechazado','revision'].includes(t.estado) ? `<button class="btn" onclick="accion(${t.id},'regenerar')">Volver a la cola</button>` : ''}
+        ${!['publicado','descartado'].includes(t.estado) ? `<button class="btn bad" onclick="accion(${t.id},'borrar')">Descartar</button>` : ''}</div>`;
+  $('#cajon-cuerpo').innerHTML = h;
+  $('#cajon').classList.add('abierto');
+}
+$('#cajon-x').onclick = () => $('#cajon').classList.remove('abierto');
+const fmtSeg = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
+async function accion(id, acc, body={}){
+  await api(`/api/trabajos/${id}/${acc}`, {method:'POST', body});
+  toast({regenerar:'Vuelve a la cola', borrar:'Descartado', aprobar:body.metadatos && revCampana ? 'Aprobado: ya está en Whop › Listos para subir' : 'Aprobado: el Publicador le busca horario', publicar:'Publicando…', rechazar:'Rechazado', guardar:'Guardado', permiso:'Permiso anotado'}[acc] || 'Hecho');
+  $('#cajon').classList.remove('abierto');
+  refrescar(); if (vista === 'revision') cargarRevision(); if (vista === 'produccion') cargarKanban();
+}
+
+// ---------- revisión ----------
+async function cargarRevision(suave){
+  const ts = await api('/api/trabajos?estado=revision');
+  $('#rev-lista').innerHTML = ts.map(t => `<div class="it ${t.id === revSel ? 'on' : ''}" onclick="selRev(${t.id})">
+      ${t.miniatura ? `<img src="${t.miniatura}">` : ''}<div style="min-width:0"><div style="font-weight:700;font-size:12.5px;line-height:1.3">${esc(t.titulo)}</div>
+      <div class="m" style="display:flex;gap:4px;margin-top:4px"><span class="chip">${TIPOS[t.tipo]}</span>${t.campana_id ? '<span class="chip acc">Whop</span>' : ''}<span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span></div></div></div>`).join('')
+    || '<div class="vacio">Nada pendiente 🎉</div>';
+  if (!suave && ts.length && !ts.find(t => t.id === revSel)) selRev(ts[0].id);
+  if (!ts.length) { revSel = null; $('#rev-det').innerHTML = '<div class="vacio">Cuando un agente termine una pieza aparecerá aquí para que la apruebes, la edites o la mandes a rehacer.</div>'; }
+}
+async function selRev(id){
+  revSel = id;
+  $$('#rev-lista .it').forEach(e => e.classList.toggle('on', e.getAttribute('onclick') === `selRev(${id})`));
+  const t = await api('/api/trabajos/' + id);
+  const d = t.datos, m = d.metadatos || {}, r = d.revision || {items:[], bloqueos:[], puntaje:0};
+  const col = r.bloqueos.length ? 'var(--bad)' : r.puntaje >= 80 ? 'var(--ok)' : 'var(--warn)';
+  const ia = d.informe_anti_ia;
+  $('#rev-det').innerHTML = `
+    <div class="rev-det ${t.formato === 'largo' ? 'horizontal' : ''}">
+      <div><video src="${t.video_url}" controls playsinline></video>
+        <div class="metr"><span class="chip">${TIPOS[t.tipo]}</span><span class="chip">${esc(nombreNicho(t.nicho))}</span><span class="chip">${t.formato === 'short' ? 'Short 9:16' : 'Largo 16:9'}</span>${d.campana_id ? `<span class="chip acc">Campaña Whop #${d.campana_id}</span>` : ''}${d.voz ? `<span class="chip">${esc(d.voz)}</span>` : ''}</div>
+      </div>
+      <div>
+        ${r.bloqueos.length ? `<div class="aviso-blq"><b>Bloqueado para publicar:</b> ${r.bloqueos.map(esc).join(', ')}. Puedes corregirlo y regenerar, o aprobar bajo tu responsabilidad.</div>` : ''}
+        <div class="cumple"><div class="anillo" style="--p:${r.puntaje};--c:${col}"><b>${r.puntaje}</b></div>
+          <div><div style="font-weight:800">Normas de monetización</div><div class="hint" style="margin:2px 0 0">El Revisor comprobó originalidad, permisos y empaquetado.</div></div></div>
+        ${r.items.map(i => `<div class="check ${i.ok ? 'si' : i.bloqueante ? 'blq' : 'no'}"><span class="ic">${i.ok ? '✓' : '!'}</span><div>${esc(i.nombre)}<small>${esc(i.detalle)}</small></div></div>`).join('')}
+        ${!r.items.find(i => i.nombre.startsWith('Permiso'))?.ok && t.tipo === 'clip' ? `<div class="acciones" style="margin-top:8px"><button class="btn sm" onclick="accion(${id},'permiso').then(()=>accion(${id},'regenerar'))">Tengo permiso: anotar y regenerar</button></div>` : ''}
+        <label class="campo">Título</label><input class="in" id="r-tit" value="${esc(m.titulo)}" maxlength="100">
+        <label class="campo">Descripción</label><textarea class="in" id="r-desc" style="min-height:130px">${esc(m.descripcion)}</textarea>
+        <label class="campo">Tags (separados por coma)</label><input class="in" id="r-tags" value="${esc((m.tags || []).join(', '))}">
+        ${ia ? `<label class="campo">Escritura humana del guion</label><div class="metr"><span class="chip">Antes ${ia.antes.puntaje}</span><span class="chip ${ia.despues.puntaje >= 70 ? 'ok' : 'warn'}">Después ${ia.despues.puntaje}</span><span class="chip">Variación de frases ${ia.despues.variacion_frases}</span></div>` : ''}
+        ${pintarMontaje(d)}
+        ${d.guion ? `<label class="campo">Guion locutado</label><div class="texto-largo">${esc(d.guion)}</div>` : ''}
+        ${d.angulo ? `<p class="hint">Ángulo propio: ${esc(d.angulo)}</p>` : ''}
+        ${d.transcripcion ? `<label class="campo">Lo que se dice en el clip</label><div class="texto-largo">${esc(d.transcripcion)}</div>` : ''}
+        <label class="campo">Si lo mandas a rehacer, ¿qué cambio?</label><input class="in" id="r-ins" placeholder="Más corto, otro gancho, menos tecnicismos…">
+        <div class="acciones">
+          ${d.campana_id ? `<button class="btn ok" onclick="aprobar(${id},'aprobar')">Aprobar: pasa a Whop para subir</button>` : `
+          <button class="btn ok" onclick="aprobar(${id},'aprobar')">Aprobar y programar</button>
+          <button class="btn" onclick="aprobar(${id},'publicar')">Aprobar y publicar ya</button>`}
+          <button class="btn" onclick="accion(${id},'guardar',{metadatos:metaForm()})">Guardar cambios</button>
+          <button class="btn" onclick="accion(${id},'regenerar',{instrucciones:$('#r-ins').value})">Rehacer</button>
+          <button class="btn bad" onclick="accion(${id},'rechazar',{motivo:$('#r-ins').value || 'rechazado en revisión'})">Rechazar</button>
+        </div>
+      </div>
+    </div>`;
+  window._bloqueos = r.bloqueos; revCampana = !!d.campana_id;
+}
+const INSERTO_TXT = {cifra:'Cifra', imagen:'Foto', lugar:'Lugar', palabra:'Palabra', rotulo:'Rótulo', cita:'Cita'};
+function pintarMontaje(d){
+  const m = d.montaje; if (!m) return '';
+  return `<label class="campo">Montaje: ${m.cortes} planos (${m.cortes_por_min}/min), ${m.insertos.length} insertos · ${esc(m.motor)}${m.receta?.origen ? ' · receta ' + esc(m.receta.origen) : ''}</label>
+    <div class="texto-largo" style="max-height:200px;white-space:normal">${m.insertos.map(i => `<div class="linea-t"><time>${fmtSeg(i.inicio)}</time><span class="chip">${INSERTO_TXT[i.tipo] || i.tipo}</span><span>${esc(i.texto)}${i.credito ? ` <span class="hint">· ${esc(i.credito)}</span>` : ''}</span></div>`).join('') || '<span class="hint">Sin insertos</span>'}
+    ${(d.visuales || []).filter(v => v.credito).length ? `<div class="hint" style="margin-top:8px">Planos de terceros: ${[...new Set(d.visuales.filter(v => v.credito).map(v => v.credito + (v.licencia ? ' (' + v.licencia + ')' : '')))].map(esc).join(' · ')}</div>` : ''}</div>`;
+}
+const metaForm = () => ({titulo: $('#r-tit').value.trim(), descripcion: $('#r-desc').value.trim(), tags: $('#r-tags').value.split(',').map(s => s.trim()).filter(Boolean)});
+function aprobar(id, acc){
+  if (window._bloqueos?.length && !confirm('Esta pieza tiene bloqueos: ' + window._bloqueos.join(', ') + '.\n¿Aprobarla de todos modos?')) return;
+  accion(id, acc, {metadatos: metaForm()});
+}
+
+// ---------- nuevo ----------
+async function llenarSelects(){
+  if (!NICHOS.length) NICHOS = await api('/api/nichos');
+  $$('.sel-nicho').forEach(s => { const v = s.value; s.innerHTML = NICHOS.map(n => `<option value="${n.id}">${esc(n.nombre)}${n.activo === false ? ' (inactivo)' : ''}</option>`).join(''); if (v) s.value = v; });
+}
+$('#n-clip-ok').onclick = async () => {
+  try { const r = await api('/api/trabajos', {method:'POST', body:{tipo:'clip', url:$('#n-clip-url').value, nicho:$('#n-clip-nicho').value, formato:$('#n-clip-fmt').value, permiso:$('#n-clip-permiso').checked}});
+    toast(`Trabajo #${r.id} en cola para el Clipper`); $('#n-clip-url').value=''; refrescar(); } catch (e) { toast(e.message); }
+};
+$('#n-ori-ok').onclick = async () => {
+  try { const r = await api('/api/trabajos', {method:'POST', body:{tipo:'original', tema:$('#n-ori-tema').value, url:$('#n-ori-url').value, nicho:$('#n-ori-nicho').value, formato:$('#n-ori-fmt').value, instrucciones:$('#n-ori-ins').value}});
+    toast(`Trabajo #${r.id} en cola para el Guionista`); $('#n-ori-tema').value=''; $('#n-ori-url').value=''; refrescar(); } catch (e) { toast(e.message); }
+};
+
+// ---------- nichos ----------
+const CAMPOS_NICHO = [['nombre','Nombre'],['descripcion','De qué va'],['tono','Tono de voz del canal'],['voz','Voz Edge-TTS'],['canal_youtube','Canal de YouTube (alias)'],['videos_por_dia','Videos por día','number'],['horarios','Horarios de publicación (coma)','lista'],['canales_referencia','Canales de referencia para el estilo (coma)','lista'],['temas_semilla','Temas semilla (uno por línea)','lineas'],['tags_base','Tags base (coma)','lista']];
+async function cargarNichos(){
+  NICHOS = await api('/api/nichos');
+  $('#nichos').innerHTML = NICHOS.map((n, i) => `
+    <div class="card nicho" data-i="${i}">
+      <div class="cab"><label class="switch"><input type="checkbox" data-f="activo" ${n.activo !== false ? 'checked' : ''}><i></i></label><b>${esc(n.nombre)}</b>
+        <span class="chip" style="margin-left:auto">${n.formato === 'largo' ? 'Largo 16:9' : 'Short 9:16'}</span></div>
+      <div class="cuerpo">
+        <div class="grid dos" style="gap:0 12px">
+          <div><label class="campo">Formato originales</label><select class="in" data-f="formato"><option value="short" ${n.formato !== 'largo' ? 'selected' : ''}>Short 9:16</option><option value="largo" ${n.formato === 'largo' ? 'selected' : ''}>Largo 16:9</option></select></div>
+          <div><label class="campo">Formato clips</label><select class="in" data-f="formato_clips"><option value="short" ${n.formato_clips !== 'largo' ? 'selected' : ''}>Short 9:16</option><option value="largo" ${n.formato_clips === 'largo' ? 'selected' : ''}>Horizontal 16:9</option></select></div>
+          ${CAMPOS_NICHO.map(([f, l, tipo]) => {
+            const v = n[f]; const val = tipo === 'lista' ? (v || []).join(', ') : tipo === 'lineas' ? (v || []).join('\n') : (v ?? '');
+            return tipo === 'lineas' ? `<div style="grid-column:1/-1"><label class="campo">${l}</label><textarea class="in" data-f="${f}" data-t="lineas" style="min-height:70px">${esc(val)}</textarea></div>`
+                 : `<div ${['descripcion','canales_referencia'].includes(f) ? 'style="grid-column:1/-1"' : ''}><label class="campo">${l}</label><input class="in" data-f="${f}" data-t="${tipo || ''}" ${tipo === 'number' ? 'type="number" min="0"' : ''} value="${esc(val)}"></div>`;
+          }).join('')}
+        </div>
+        <div class="estilo">${n._estilo ? `<b>Patrón aprendido</b> <span class="hint">(${esc(n._estilo.motor || '')}, ${esc((n._estilo.actualizado || '').slice(0,10))})</span>
+            <p style="margin:6px 0"><b>Tono:</b> ${esc(n._estilo.tono)}</p>
+            ${n._estilo.ganchos ? `<b>Ganchos</b><ul>${n._estilo.ganchos.slice(0,4).map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}
+            ${n._estilo.formulas_titulo ? `<b>Fórmulas de título</b><ul>${n._estilo.formulas_titulo.slice(0,4).map(g => `<li>${esc(g)}</li>`).join('')}</ul>` : ''}`
+          : '<span class="hint">Todavía no hay patrón de estilo. Añade 2 o 3 canales de referencia exitosos y pulsa «Analizar estilo».</span>'}
+          <div class="acciones" style="margin-top:10px"><button class="btn sm" onclick="analizar('${n.id}')">Analizar estilo</button></div>
+        </div>
+        <div class="estilo">${pintarReceta(n._edicion)}
+          <div class="acciones" style="margin-top:10px"><button class="btn sm" onclick="analizarEdicion('${n.id}')">Analizar edición</button></div>
+        </div>
+      </div>
+    </div>`).join('');
+  llenarSelects();
+}
+function leerNichos(){
+  return $$('#nichos .nicho').map(card => {
+    const n = {...NICHOS[+card.dataset.i]}; delete n._estilo; delete n._edicion;
+    card.querySelectorAll('[data-f]').forEach(el => {
+      const f = el.dataset.f, t = el.dataset.t;
+      n[f] = el.type === 'checkbox' ? el.checked : t === 'lista' ? el.value.split(',').map(s => s.trim()).filter(Boolean)
+           : t === 'lineas' ? el.value.split('\n').map(s => s.trim()).filter(Boolean) : t === 'number' ? +el.value : el.value;
+    });
+    if (!n.id) n.id = (n.nombre || 'nicho').toLowerCase().normalize('NFD').replace(/[^\w]+/g, '_').replace(/^_|_$/g, '');
+    return n;
+  });
+}
+$('#nichos-save').onclick = async () => { await api('/api/nichos', {method:'POST', body:leerNichos()}); toast('Nichos guardados'); cargarNichos(); };
+$('#nicho-add').onclick = () => { NICHOS = leerNichos(); NICHOS.push({id:'', nombre:'Nuevo nicho', activo:true, formato:'short', formato_clips:'short', voz:'es-MX-JorgeNeural', videos_por_dia:1, horarios:['19:00'], temas_semilla:[], canales_referencia:[], tags_base:[]});
+  api('/api/nichos', {method:'POST', body:NICHOS.map((n,i) => ({...n, id: n.id || 'nicho_' + Date.now()}))}).then(cargarNichos); };
+const RECETA_FLAGS = {cifras:'Cifras', imagenes:'Fotos enmarcadas', palabras_clave:'Palabras clave', rotulos:'Rótulos', zoom_punch:'Zooms'};
+const RECETA_TXT = {plano_medio_s:['s por plano'], insertos_por_min:['insertos/min'], cortes_por_min:['cortes/min'], sfx_cortes:['cortes con efecto', v => Math.round(v*100) + '%']};
+function pintarReceta(e){
+  if (!e || (!e.short && !e.largo)) return '<b>Receta de edición</b><p class="hint">Todavía no medida. Con canales de referencia, «Analizar edición» baja 2 videos top por canal a 360p, mide cortes, golpes de sonido y (con Gemini) qué insertos usan, y los borra. Mientras tanto se usa la receta por defecto.</p>';
+  return `<b>Receta de edición</b> <span class="hint">(${esc((e.actualizado || '').slice(0,10))}, ${(e.muestras || []).length} videos medidos)</span>` +
+    ['short','largo'].filter(f => e[f]).map(f => `<div class="hint" style="margin:8px 0 0">${f === 'short' ? 'Shorts' : 'Largos'}</div><div class="receta">${
+      Object.entries(RECETA_TXT).filter(([k]) => e[f][k] != null).map(([k, [l, fmt]]) => `<div><b>${fmt ? fmt(e[f][k]) : e[f][k]}</b><span>${l}</span></div>`).join('')}</div>
+      <div class="metr">${['cifras','imagenes','palabras_clave','rotulos','zoom_punch'].map(k => `<span class="chip ${e[f][k] ? 'ok' : ''}">${RECETA_FLAGS[k]}</span>`).join('')}</div>`).join('');
+}
+async function analizarEdicion(id){ await api(`/api/nichos/${id}/edicion`, {method:'POST'}); toast('El Analista está midiendo la edición de los canales de referencia'); }
+async function analizar(id){ await api(`/api/nichos/${id}/analizar`, {method:'POST'}); toast('El Analista de estilo está trabajando (mira la Sala de control)'); }
+
+// ---------- biblioteca ----------
+const LIC_TXT = {cc0:'CC0', pdm:'Dominio público', 'cc-by':'CC BY', 'cc-by-sa':'CC BY-SA', pexels:'Pexels', pixabay:'Pixabay', nasa:'NASA', propio:'Propio', generado:'Generado'};
+async function cargarBiblioteca(){
+  if (!NICHOS.length) NICHOS = await api('/api/nichos');
+  $('#bib-nicho').innerHTML = '<option value="">Cualquiera</option>' + NICHOS.map(n => `<option value="${n.id}">${esc(n.nombre)}</option>`).join('');
+  const q = $('#bib-q').value.trim(), tipo = $('#bib-tipo').value;
+  const r = await api(`/api/biblioteca?q=${encodeURIComponent(q)}&tipo=${tipo}`);
+  const e = r.estadisticas, total = Object.values(e.por_tipo).reduce((a, b) => a + b, 0);
+  $('#bib-stats').innerHTML = `<div><b>${total}</b><span>recursos</span></div>` + ['video','imagen','audio'].map(t => `<div><b>${e.por_tipo[t] || 0}</b><span>${t === 'audio' ? 'audio y efectos' : t + 's'}</span></div>`).join('') + `<div><b>${e.con_embedding}</b><span>con búsqueda por significado</span></div>`;
+  $('#bib-sem').innerHTML = e.semantica === 'no instalado'
+    ? 'Búsqueda por significado: no instalada. Ahora busca por palabras. Para que entienda frases («gente celebrando en la calle») instala <code>pip install sentence-transformers</code> y pulsa <button class="btn sm" onclick="recalcular()">Calcular índice</button>'
+    : `Búsqueda por significado: ${esc(e.semantica)}. <button class="btn sm" onclick="recalcular()">Calcular lo que falte</button>`;
+  $('#bib-grid').innerHTML = r.recursos.map(x => `<div class="rec">
+      <div class="vis">${x.tipo === 'imagen' ? `<img src="/media/biblioteca/${x.id}" loading="lazy">` : x.tipo === 'video' ? `<video src="/media/biblioteca/${x.id}#t=1" preload="metadata" muted></video>` : '♪'}</div>
+      <div class="inf"><div class="et">${esc(x.descripcion || x.etiquetas || 'sin etiquetas')}</div>
+        <div class="hint" style="margin:0">${esc(x.credito || '')}</div>
+        <div class="pie"><span class="chip ${x.licencia === 'cc-by' || x.licencia === 'cc-by-sa' ? 'warn' : 'ok'}">${LIC_TXT[x.licencia] || esc(x.licencia)}</span><span class="chip">${x.tipo}</span>${x.usos ? `<span class="chip">${x.usos} usos</span>` : ''}${x.puntaje != null ? `<span class="chip acc">${x.puntaje}</span>` : ''}
+        <button class="btn sm bad" style="margin-left:auto;padding:2px 8px" onclick="borrarRecurso(${x.id})">×</button></div></div></div>`).join('')
+    || '<div class="vacio">Vacía. Se irá llenando sola con lo que use el Editor, o añade tu material.</div>';
+}
+async function borrarRecurso(id){ if (!confirm('¿Quitar este recurso de la biblioteca y borrar el archivo?')) return; await api('/api/biblioteca/' + id, {method:'DELETE'}); cargarBiblioteca(); }
+async function recalcular(){ const r = await api('/api/biblioteca/embeddings', {method:'POST'}); toast(r.estado === 'no instalado' ? 'Primero instala sentence-transformers' : 'Calculando el índice en segundo plano'); }
+$('#bib-buscar').onclick = cargarBiblioteca;
+$('#bib-q').onkeydown = e => { if (e.key === 'Enter') cargarBiblioteca(); };
+$('#bib-tipo').onchange = cargarBiblioteca;
+$('#bib-subir').onclick = async () => {
+  const f = $('#bib-archivo').files[0]; if (!f) return toast('Elige un archivo');
+  const fd = new FormData(); fd.append('archivo', f); fd.append('licencia', $('#bib-lic').value); fd.append('credito', $('#bib-cred').value);
+  fd.append('etiquetas', $('#bib-et').value); fd.append('nicho', $('#bib-nicho').value); fd.append('url_origen', $('#bib-url').value);
+  const r = await fetch('/api/biblioteca', {method:'POST', body:fd}); const j = await r.json().catch(() => ({}));
+  if (!r.ok) return toast(j.error || 'No se pudo subir');
+  toast('Añadido a la biblioteca'); $('#bib-archivo').value = ''; $('#bib-et').value = ''; cargarBiblioteca();
+};
+
+// ---------- fuentes ----------
+let FUENTES = [];
+async function cargarFuentes(){
+  if (!NICHOS.length) NICHOS = await api('/api/nichos');
+  FUENTES = await api('/api/fuentes');
+  pintarFuentes();
+}
+function pintarFuentes(){
+  $('#fuentes').innerHTML = FUENTES.map((f, i) => `<tr data-i="${i}">
+    <td><input type="checkbox" data-f="activa" ${f.activa ? 'checked' : ''} style="accent-color:var(--accent)"></td>
+    <td><input class="in" data-f="nombre" value="${esc(f.nombre)}"></td>
+    <td style="min-width:260px"><input class="in" data-f="url" value="${esc(f.url)}"></td>
+    <td><select class="in" data-f="nicho">${NICHOS.map(n => `<option value="${n.id}" ${n.id === f.nicho ? 'selected' : ''}>${esc(n.nombre)}</option>`).join('')}</select></td>
+    <td><select class="in" data-f="uso"><option value="clips" ${f.uso === 'clips' ? 'selected' : ''}>Clips</option><option value="referencia" ${f.uso === 'referencia' ? 'selected' : ''}>Referencia</option></select></td>
+    <td><input type="checkbox" data-f="permite_clips" ${f.permite_clips ? 'checked' : ''} style="accent-color:var(--ok)"></td>
+    <td><button class="btn sm bad" onclick="FUENTES=leerFuentes();FUENTES.splice(${i},1);pintarFuentes()">Quitar</button></td></tr>`).join('');
+}
+function leerFuentes(){
+  return $$('#fuentes tr').map(tr => { const f = {...FUENTES[+tr.dataset.i]};
+    tr.querySelectorAll('[data-f]').forEach(el => f[el.dataset.f] = el.type === 'checkbox' ? el.checked : el.value.trim());
+    f.plataforma = f.url.includes('twitch') ? 'twitch' : 'youtube'; return f; });
+}
+$('#fuente-add').onclick = () => { FUENTES = leerFuentes(); FUENTES.push({nombre:'', url:'', nicho:NICHOS[0]?.id, uso:'clips', permite_clips:false, activa:true}); pintarFuentes(); };
+$('#fuentes-save').onclick = async () => { await api('/api/fuentes', {method:'POST', body:leerFuentes()}); toast('Fuentes guardadas'); };
+
+// ---------- laboratorio ----------
+async function laboratorio(solo){
+  const texto = $('#lab-in').value;
+  $('#lab-out').innerHTML = '<div class="vacio">Analizando…</div>';
+  try {
+    const r = await api('/api/laboratorio', {method:'POST', body:{texto, solo_medir:solo}});
+    const a = r.antes; let marcado = esc(texto);
+    [...new Set(a.hallazgos.map(h => h.fragmento))].sort((x, y) => y.length - x.length).forEach(f => { marcado = marcado.split(esc(f)).join(`<mark>${esc(f)}</mark>`); });
+    $('#lab-out').innerHTML = `<div class="metr"><span class="chip ${a.puntaje >= 70 ? 'ok' : 'warn'}">Escritura humana: ${a.puntaje}/100</span><span class="chip">Variación de frases: ${a.variacion_frases}</span>${r.despues ? `<span class="chip ok">Después: ${r.despues.puntaje}/100</span><span class="chip">${esc(r.motor)}</span>` : ''}</div>
+      ${a.hallazgos.length ? `<label class="campo">Lo que suena a IA</label>` + [...new Map(a.hallazgos.map(h => [h.motivo, h])).values()].map(h => `<div class="check no"><span class="ic">!</span><div>${esc(h.motivo)}<small>«${esc(h.fragmento)}»</small></div></div>`).join('') : '<p class="hint">No encontré muletillas típicas de IA.</p>'}
+      <label class="campo">Texto marcado</label><div class="texto-largo">${marcado}</div>
+      ${r.texto ? `<label class="campo">Versión propuesta</label><div class="texto-largo" style="border-color:rgba(62,207,142,.35)">${esc(r.texto)}</div>` : ''}`;
+  } catch (e) { $('#lab-out').innerHTML = `<div class="aviso-blq">${esc(e.message)}</div>`; }
+}
+$('#lab-ok').onclick = () => laboratorio(false);
+$('#lab-medir').onclick = () => laboratorio(true);
+
+// ---------- ajustes ----------
+async function cargarAjustes(){
+  const [a, k] = await Promise.all([api('/api/ajustes'), api('/api/claves')]);
+  $$('.clave').forEach(i => { i.value = k[i.dataset.k] || ''; });
+  const cs = await api('/api/canales');
+  $('#canales').innerHTML = cs.length ? cs.map(c => `<div class="prov"><b>${esc(c.alias)}</b><span class="hint" style="margin:0">${esc(c.titulo || 'sin nombre')} ${c.id ? '· ' + esc(c.id) : ''}</span><span class="chip ok">conectado</span></div>`).join('') : '<div class="vacio">Ningún canal conectado todavía.</div>';
+  $('#aj-orden').value = a.llm.orden.join(', '); $('#aj-gem').value = a.llm.gemini.modelo; $('#aj-oc').value = a.llm.opencode.modelo; $('#aj-oll').value = a.llm.ollama.modelo;
+  $('#aj-manual').checked = a.aprobacion_manual; $('#aj-umbral').value = a.umbral_auto_aprobacion; $('#aj-intervalo').value = a.intervalo_ciclo_min;
+  $('#aj-max').value = a.max_trabajos_por_ciclo; $('#aj-whisper').value = a.whisper_modelo; $('#aj-modo').value = a.modo_publicacion; $('#aj-priv').value = a.privacidad_publicacion;
+}
+$('#claves-save').onclick = async () => { const b = {}; $$('.clave').forEach(i => b[i.dataset.k] = i.value); await api('/api/claves', {method:'POST', body:b}); toast('Claves guardadas en .env'); cargarAjustes(); };
+async function guardarLLM(){ await api('/api/ajustes', {method:'POST', body:{llm:{orden:$('#aj-orden').value.split(',').map(s => s.trim()).filter(Boolean), gemini:{modelo:$('#aj-gem').value}, opencode:{modelo:$('#aj-oc').value}, ollama:{modelo:$('#aj-oll').value}}}}); }
+$('#llm-test').onclick = async () => {
+  await guardarLLM(); $('#prov-res').innerHTML = '<div class="hint">Probando…</div>';
+  const rs = await api('/api/llm/probar');
+  $('#prov-res').innerHTML = rs.map(r => `<div class="prov"><b>${r.proveedor}</b><span class="hint" style="margin:0">${esc(r.modelo || '—')} · ${esc(r.detalle)}</span><span class="chip ${r.estado === 'ok' ? 'ok' : r.estado === 'error' ? 'bad' : ''}">${r.estado}</span></div>`).join('');
+};
+$('#aj-save').onclick = async () => {
+  await guardarLLM();
+  await api('/api/ajustes', {method:'POST', body:{aprobacion_manual:$('#aj-manual').checked, umbral_auto_aprobacion:+$('#aj-umbral').value, intervalo_ciclo_min:+$('#aj-intervalo').value,
+    max_trabajos_por_ciclo:+$('#aj-max').value, whisper_modelo:$('#aj-whisper').value, modo_publicacion:$('#aj-modo').value, privacidad_publicacion:$('#aj-priv').value}});
+  toast('Ajustes guardados');
+};
+
+// ---------- whop ----------
+let WHOP = {campanas: [], plataformas: {}}, campSel = null;
+const ENVIO_TXT = {publicado:'Publicado', enviado:'Enviado a Whop', aprobado:'Aprobado por la marca', rechazado:'Rechazado', pagado:'Pagado'};
+const ENVIO_CHIP = {publicado:'', enviado:'info', aprobado:'ok', rechazado:'bad', pagado:'ok'};
+const dinero = n => '$' + (+n || 0).toLocaleString('es', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const miles = n => (+n || 0).toLocaleString('es');
+const nomPlat = p => (WHOP.plataformas[p] || {}).nombre || p;
+const escribiendo = () => document.activeElement && $('#v-whop').contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+
+async function cargarWhop(suave){
+  if (suave && escribiendo()) return;
+  WHOP = await api('/api/whop/campanas');
+  const cs = WHOP.campanas, act = cs.filter(c => c.estado === 'activa');
+  const sum = k => cs.reduce((a, c) => a + (c.resumen[k] || 0), 0);
+  $('#w-k-act').textContent = act.length; $('#w-k-rev').textContent = sum('revision'); $('#w-k-sub').textContent = sum('listos');
+  $('#w-k-vis').textContent = miles(sum('vistas')); $('#w-k-gan').textContent = dinero(sum('estimado'));
+  $('#w-lista').innerHTML = cs.map(c => `<div class="camp ${c.id === campSel ? 'on' : ''}" onclick="selCampana(${c.id})">
+      <b>${esc(c.nombre)}</b><div class="hint" style="margin:2px 0 0">${esc(c.datos.marca || 'Sin marca')}${c.datos.cpm ? ' · ' + dinero(c.datos.cpm) + ' / 1000 vistas' : ''}</div>
+      <div class="m"><span class="chip ${c.estado === 'activa' ? (c.resumen.vencida ? 'warn' : 'ok') : ''}">${c.resumen.vencida ? 'vencida' : c.estado}</span>
+      ${c.resumen.revision ? `<span class="chip warn">${c.resumen.revision} revisar</span>` : ''}${c.resumen.listos ? `<span class="chip acc">${c.resumen.listos} subir</span>` : ''}
+      ${c.resumen.enlaces ? `<span class="chip">${c.resumen.enlaces} enlaces</span>` : ''}</div></div>`).join('')
+    || '<div class="vacio">Aún no hay campañas</div>';
+  if (campSel && cs.find(c => c.id === campSel)) selCampana(campSel, true);
+  else if (!suave && cs.length) selCampana((act[0] || cs[0]).id);
+}
+
+async function selCampana(id, suave){
+  if (suave && escribiendo()) return;
+  campSel = id;
+  $$('#w-lista .camp').forEach(e => e.classList.toggle('on', e.getAttribute('onclick') === `selCampana(${id})`));
+  const c = await api('/api/whop/campanas/' + id), d = c.datos, r = c.resumen;
+  const fuentes = c.clips.filter(t => t.tipo === 'fuente_clip'), clips = c.clips.filter(t => t.tipo === 'clip');
+  const listos = clips.filter(t => t.por_subir);
+  const enRev = clips.filter(t => t.estado === 'revision');
+  const enCurso = c.clips.filter(t => ['en_cola','procesando','error'].includes(t.estado));
+  const pasos = [['Material', r.material], ['Produciendo', r.produciendo], ['Para revisar', r.revision], ['Listos para subir', r.listos], ['Enlaces', r.enlaces], ['Cobrado', dinero(r.cobrado)]];
+  $('#w-det').innerHTML = `
+    <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em">${esc(c.nombre)}</div>
+        <div class="hint" style="margin:2px 0 0">${esc(d.marca || 'Sin marca')}${d.fecha_fin ? ' · termina ' + esc(d.fecha_fin) : ''}${d.url_whop ? ` · <a href="${esc(d.url_whop)}" target="_blank" rel="noopener">abrir en Whop</a>` : ''}</div></div>
+      <button class="btn sm" onclick="formCampana(${c.id})">Editar reglas</button>
+      <button class="btn sm" onclick="estadoCampana(${c.id}, '${c.estado === 'activa' ? 'pausada' : 'activa'}')">${c.estado === 'activa' ? 'Pausar' : 'Reactivar'}</button>
+      ${c.estado !== 'cerrada' ? `<button class="btn sm bad" onclick="estadoCampana(${c.id}, 'cerrada')">Cerrar</button>` : ''}
+    </div>
+    <div class="reglas">
+      <span class="chip ${c.estado === 'activa' && !r.vencida ? 'ok' : 'warn'}">${r.vencida ? 'vencida' : c.estado}</span>
+      <span class="chip acc">${d.cpm ? dinero(d.cpm) + ' / 1000 vistas' : 'CPM sin definir'}</span>
+      ${d.pago_max_clip ? `<span class="chip">tope ${dinero(d.pago_max_clip)} por clip</span>` : ''}${d.vistas_min ? `<span class="chip">mínimo ${miles(d.vistas_min)} vistas</span>` : ''}
+      <span class="chip">${d.formato === 'short' ? 'Vertical 9:16' : 'Horizontal 16:9'}</span><span class="chip">${d.dur_min}-${d.dur_max} s</span>
+      ${d.plataformas.map(p => `<span class="chip info">${esc(nomPlat(p))}</span>`).join('')}
+      ${d.hashtags.map(h => `<span class="chip">${esc(h)}</span>`).join('')}${d.menciones.map(m => `<span class="chip">${esc(m)}</span>`).join('')}
+    </div>
+    ${d.texto_obligatorio ? `<p class="hint">Texto obligatorio: «${esc(d.texto_obligatorio)}»</p>` : ''}
+    ${d.prohibe_automatizado ? `<div class="aviso-blq" style="margin-top:12px">Esta campaña no admite clips automatizados o repetitivos. Mira cada clip entero, cambia el título y el caption a mano y no subas dos tramos parecidos.</div>` : ''}
+    ${d.notas ? `<p class="hint">${esc(d.notas)}</p>` : ''}
+    <div class="flujo">${pasos.map(([l, n], i) => `<div class="${(i === 2 && r.revision) || (i === 3 && r.listos) ? 'act' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+
+    <label class="campo">Material de la campaña</label>
+    ${fuentes.length ? fuentes.map(t => `<div class="fila-curso" style="padding:7px 0"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px;cursor:pointer" onclick="abrirTrabajo(${t.id})">#${t.id} · ${esc(t.titulo)}</div>
+        <div class="hint" style="margin:1px 0 0">${esc(t.etapa || ESTADO_TXT[t.estado])}</div>${t.estado === 'procesando' ? `<div class="barra"><i style="width:${t.progreso}%"></i></div>` : ''}</div>
+        <span class="chip ${ESTADO_CHIP[t.estado]}">${ESTADO_TXT[t.estado]}</span></div>`).join('') : '<div class="hint">Todavía no se mandó material al Clipper.</div>'}
+    ${d.material.filter(u => !fuentes.find(t => t.fuente_url === u)).map(u => `<div class="hint" style="word-break:break-all">Sin lanzar: ${esc(u)}</div>`).join('')}
+    <div class="envio"><textarea class="in" id="w-mat" style="min-height:44px" placeholder="Enlaces del material (YouTube, Twitch, Drive de un archivo, enlace directo a .mp4), uno por línea"></textarea>
+      <button class="btn pri" onclick="lanzarMaterial(${c.id})" ${c.estado !== 'activa' ? 'disabled' : ''}>Sacar clips</button></div>
+    <p class="hint">El Clipper corta tramos de ${d.dur_min}-${d.dur_max} s, ${d.clips_por_video} por video, ${d.subtitulos ? 'con subtítulos' : 'sin subtítulos'}${d.intro_narrada ? ' e intro narrada' : ''}. De una carpeta de Drive, pega el enlace de cada archivo.</p>
+
+    ${enCurso.length ? `<label class="campo">En producción</label>` + enCurso.filter(t => t.tipo === 'clip').map(tarjeta).join('') : ''}
+
+    <label class="campo">Para revisar (${enRev.length})</label>
+    ${enRev.map(t => `<div class="fila-curso" style="padding:7px 0">${t.miniatura ? `<img src="${t.miniatura}" style="width:34px;height:48px;border-radius:6px;object-fit:cover">` : ''}
+        <div style="flex:1;min-width:0;font-weight:700;font-size:12.5px">${esc(t.titulo)}<div class="hint" style="margin:1px 0 0">${fmtSeg(t.inicio || 0)} – ${fmtSeg(t.fin || 0)}${t.bloqueos.length ? ' · bloqueos: ' + esc(t.bloqueos.join(', ')) : ''}</div></div>
+        <span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span><button class="btn sm" onclick="ir('revision');selRev(${t.id})">Revisar</button></div>`).join('')
+      || '<div class="hint">Nada pendiente. Los clips de campaña nunca se aprueban solos.</div>'}
+
+    <label class="campo">Listos para subir (${listos.length})</label>
+    ${listos.map(t => clipParaSubir(t, c)).join('') || '<div class="hint">Cuando apruebes un clip en Revisión aparecerá aquí con su video, su caption para cada red y un hueco para pegar el enlace publicado.</div>'}
+
+    <label class="campo" style="display:flex;align-items:center">Enlaces enviados a la campaña
+      <button class="btn sm" style="margin-left:auto" onclick="todasLasVistas()">Actualizar vistas</button></label>
+    ${c.envios.length ? `<div style="overflow-x:auto"><table><thead><tr><th>Red</th><th>Enlace</th><th>Vistas</th><th>Estimado</th><th>Estado</th><th>Pagado</th><th></th></tr></thead><tbody>
+      ${c.envios.map(e => `<tr><td><span class="chip info">${esc(nomPlat(e.plataforma))}</span></td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>${e.trabajo_id ? ` <span class="ev"><span class="lnk" onclick="abrirTrabajo(${e.trabajo_id})">#${e.trabajo_id}</span></span>` : ''}</td>
+        <td><input class="in num" type="number" min="0" value="${e.vistas}" onchange="editarEnvio(${e.id}, {vistas:this.value})" title="${e.vistas_actualizadas ? 'Leídas ' + fecha(e.vistas_actualizadas) : 'Puestas a mano'}"></td>
+        <td>${dinero(e.estimado)}</td>
+        <td><select class="in" onchange="editarEnvio(${e.id}, {estado:this.value})">${Object.entries(ENVIO_TXT).map(([k, v]) => `<option value="${k}" ${k === e.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
+        <td><input class="in num" type="number" min="0" step="0.01" value="${e.pago || ''}" placeholder="0" onchange="editarEnvio(${e.id}, {pago:this.value})"></td>
+        <td style="white-space:nowrap"><button class="btn sm" title="Leer vistas" onclick="leerVistas(${e.id})">↻</button> <button class="btn sm bad" title="Quitar" onclick="borrarEnvio(${e.id})">×</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="hint">Estimado = vistas / 1000 × CPM${d.pago_max_clip ? ', con tope por clip' : ''}${d.vistas_min ? `, desde ${miles(d.vistas_min)} vistas` : ''}. Cuando mandes el enlace en Whop cambia el estado a «Enviado».</p>`
+    : '<div class="hint">Todavía no hay enlaces.</div>'}
+    <div class="envio"><input class="in" id="w-link" placeholder="Pegar un enlace publicado que no salió de la fábrica">
+      <button class="btn" onclick="registrarEnlace(${c.id}, null, '#w-link')">Añadir</button></div>`;
+}
+
+function clipParaSubir(t, c){
+  const caps = t.metadatos.captions || {}, d = c.datos;
+  return `<div class="subir ${t.formato === 'largo' ? 'h' : ''}">
+    <div>${t.video_url ? `<video src="${t.video_url}" controls playsinline preload="metadata"></video>` : ''}
+      <div class="acciones" style="margin-top:8px"><a class="btn sm" href="${t.video_url}" download="whop_${c.id}_${t.id}.mp4">Descargar</a></div></div>
+    <div style="min-width:0">
+      <div style="font-weight:800">${esc(t.metadatos.titulo || t.titulo)}</div>
+      ${d.plataformas.map(p => `<div class="cap"><b>${esc(nomPlat(p))}</b><pre id="cap-${t.id}-${p}">${esc(p === 'youtube' ? (t.metadatos.titulo || '') + '\n\n' + (caps[p] || t.metadatos.descripcion || '') : caps[p] || '')}</pre>
+        <button class="btn sm" onclick="copiar('#cap-${t.id}-${p}')">Copiar</button></div>`).join('')}
+      ${t.enlaces.length ? `<div class="metr">${t.enlaces.map(e => `<span class="chip ok">${esc(nomPlat(e.plataforma))} ✓</span>`).join('')}</div>` : ''}
+      <div class="envio"><input class="in" id="lnk-${t.id}" placeholder="Pega aquí el enlace cuando lo publiques">
+        <button class="btn ok" onclick="registrarEnlace(${c.id}, ${t.id}, '#lnk-${t.id}')">Registrar</button>
+        ${d.plataformas.includes('youtube') && !t.enlaces.find(e => e.plataforma === 'youtube') ? `<button class="btn" onclick="subirYoutube(${t.id})">Subir a YouTube</button>` : ''}</div>
+    </div></div>`;
+}
+
+async function copiar(sel){
+  const txt = $(sel).textContent;
+  try { await navigator.clipboard.writeText(txt); toast('Copiado'); }
+  catch { const r = document.createRange(); r.selectNodeContents($(sel)); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Seleccionado: pulsa Ctrl+C'); }
+}
+async function lanzarMaterial(id){
+  const urls = $('#w-mat').value.split(/\s+/).filter(Boolean);
+  try { const r = await api(`/api/whop/campanas/${id}/material`, {method:'POST', body:{urls}});
+    toast(r.lanzados.length ? `${r.lanzados.length} videos al Clipper` : 'Ese material ya estaba lanzado'); $('#w-mat').value = ''; cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function registrarEnlace(cid, tid, sel){
+  const url = $(sel).value.trim(); if (!url) return toast('Pega el enlace');
+  try { await api('/api/whop/envios', {method:'POST', body:{campana_id:cid, trabajo_id:tid, url}}); toast('Enlace registrado'); $(sel).value = ''; cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function subirYoutube(tid){
+  if (!confirm('Se sube con el modo de publicación de Ajustes (simulado o real) al canal de la campaña o del nicho. ¿Seguir?')) return;
+  try { const r = await api(`/api/whop/clips/${tid}/youtube`, {method:'POST'}); toast(r.url ? 'Subido: ' + r.url : (r.mensaje || r.error || r.estado)); cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function editarEnvio(id, body){ try { await api('/api/whop/envios/' + id, {method:'POST', body}); cargarWhop(); } catch (e) { toast(e.message); } }
+async function borrarEnvio(id){ if (!confirm('¿Quitar este enlace?')) return; await api('/api/whop/envios/' + id, {method:'DELETE'}); cargarWhop(); }
+async function leerVistas(id){ try { const r = await api(`/api/whop/envios/${id}/vistas`, {method:'POST'}); toast(miles(r.vistas) + ' vistas'); cargarWhop(); } catch (e) { toast(e.message); } }
+async function todasLasVistas(){ await api('/api/whop/vistas', {method:'POST'}); toast('Leyendo vistas de todos los enlaces en segundo plano'); setTimeout(cargarWhop, 8000); }
+async function estadoCampana(id, estado){
+  if (estado === 'cerrada' && !confirm('¿Cerrar la campaña? Los clips y enlaces se quedan guardados.')) return;
+  await api('/api/whop/campanas/' + id, {method:'POST', body:{estado}}); cargarWhop();
+}
+
+// formulario de campaña (en el cajón lateral)
+function formCampana(id){
+  const c = WHOP.campanas.find(x => x.id === id), d = c ? c.datos : {plataformas:['youtube','tiktok','instagram'], formato:'short', dur_min:15, dur_max:60, clips_por_video:4, subtitulos:true, reencuadre:'desenfoque'};
+  const v = k => esc(d[k] ?? '');
+  $('#cajon-tit').textContent = c ? 'Editar campaña' : 'Nueva campaña de Whop';
+  $('#cajon-cuerpo').innerHTML = `
+    <label class="campo">Pega aquí la página de la campaña (reglas, pagos, enlaces)</label>
+    <textarea class="in" id="c-texto" style="min-height:110px" placeholder="Copia todo el texto de la campaña en Whop y pégalo: el bot rellena los campos.">${v('reglas_texto')}</textarea>
+    <div class="acciones" style="margin-top:8px"><button class="btn" id="c-leer">Leer reglas</button><span class="hint" id="c-leer-res" style="margin:0;align-self:center"></span></div>
+    <label class="campo">Nombre</label><input class="in" id="c-nombre" value="${esc(c ? c.nombre : '')}" placeholder="Clips del podcast X">
+    <div class="grid dos" style="gap:12px">
+      <div><label class="campo">Marca o creador</label><input class="in" id="c-marca" value="${v('marca')}"></div>
+      <div><label class="campo">Enlace de la campaña en Whop</label><input class="in" id="c-url" value="${v('url_whop')}" placeholder="https://whop.com/..."></div>
+    </div>
+    <label class="campo">Material fuente (un enlace por línea)</label>
+    <textarea class="in" id="c-material" style="min-height:70px" placeholder="https://www.youtube.com/watch?v=...&#10;https://drive.google.com/file/d/...">${esc((d.material || []).join('\n'))}</textarea>
+    <label class="campo">Plataformas</label>
+    <div class="metr">${Object.entries(WHOP.plataformas).map(([k, p]) => `<label class="chk" style="margin:0 10px 0 0"><input type="checkbox" class="c-plat" value="${k}" ${(d.plataformas || []).includes(k) ? 'checked' : ''}><span>${esc(p.nombre)}</span></label>`).join('')}</div>
+    <div class="grid tres" style="gap:12px">
+      <div><label class="campo">Formato</label><select class="in" id="c-formato"><option value="short" ${d.formato !== 'largo' ? 'selected' : ''}>Vertical 9:16</option><option value="largo" ${d.formato === 'largo' ? 'selected' : ''}>Horizontal 16:9</option></select></div>
+      <div><label class="campo">Duración mínima (s)</label><input class="in" type="number" id="c-dmin" value="${v('dur_min')}"></div>
+      <div><label class="campo">Duración máxima (s)</label><input class="in" type="number" id="c-dmax" value="${v('dur_max')}"></div>
+      <div><label class="campo">CPM ($ por 1000 vistas)</label><input class="in" type="number" step="0.01" id="c-cpm" value="${v('cpm')}"></div>
+      <div><label class="campo">Tope por clip ($)</label><input class="in" type="number" step="0.01" id="c-tope" value="${v('pago_max_clip')}"></div>
+      <div><label class="campo">Vistas mínimas</label><input class="in" type="number" id="c-vmin" value="${v('vistas_min')}"></div>
+      <div><label class="campo">Presupuesto total ($)</label><input class="in" type="number" step="0.01" id="c-presu" value="${v('presupuesto')}"></div>
+      <div><label class="campo">Termina el</label><input class="in" type="date" id="c-fin" value="${v('fecha_fin')}"></div>
+      <div><label class="campo">Clips por video</label><input class="in" type="number" min="1" max="15" id="c-n" value="${v('clips_por_video')}"></div>
+    </div>
+    <label class="campo">Hashtags obligatorios</label><input class="in" id="c-hash" value="${esc((d.hashtags || []).join(' '))}" placeholder="#marca #clip">
+    <label class="campo">Menciones obligatorias</label><input class="in" id="c-men" value="${esc((d.menciones || []).join(' '))}" placeholder="@marca">
+    <label class="campo">Texto obligatorio en la descripción o caption</label><input class="in" id="c-txt" value="${v('texto_obligatorio')}" placeholder="Link en mi perfil">
+    <div class="grid dos" style="gap:12px">
+      <div><label class="campo">Nicho (estilo de títulos y subtítulos)</label><select class="in" id="c-nicho">${NICHOS.map(n => `<option value="${n.id}" ${n.id === d.nicho ? 'selected' : ''}>${esc(n.nombre)}</option>`).join('')}</select></div>
+      <div><label class="campo">Reencuadre</label><select class="in" id="c-reen"><option value="desenfoque">Fondo desenfocado</option><option value="recorte" ${d.reencuadre === 'recorte' ? 'selected' : ''}>Recortar al centro</option></select></div>
+      <div><label class="campo">Canal de YouTube (alias)</label><input class="in" id="c-canal" value="${v('canal_youtube')}" placeholder="el del nicho"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="c-subs" ${d.subtitulos !== false ? 'checked' : ''}><span>Quemar subtítulos</span></label>
+    <label class="chk"><input type="checkbox" id="c-intro" ${d.intro_narrada ? 'checked' : ''}><span>Intro narrada con voz sintética <span class="hint">Muchas campañas no la quieren: déjala apagada salvo que la pidan.</span></span></label>
+    <label class="chk"><input type="checkbox" id="c-auto" ${d.prohibe_automatizado ? 'checked' : ''}><span>La campaña prohíbe clips automatizados o repetitivos <span class="hint">Se recuerda en cada revisión. Igualmente ningún clip de campaña se aprueba solo.</span></span></label>
+    <label class="campo">Notas</label><textarea class="in" id="c-notas" style="min-height:60px">${v('notas')}</textarea>
+    <div class="acciones">
+      <button class="btn pri" id="c-ok">${c ? 'Guardar' : 'Crear campaña'}</button>
+      ${c ? '' : '<button class="btn" id="c-ok-lanzar">Crear y sacar clips</button>'}
+    </div>`;
+  $('#c-leer').onclick = async () => {
+    $('#c-leer-res').textContent = 'Leyendo…';
+    try { rellenarCampana(await api('/api/whop/reglas', {method:'POST', body:{texto:$('#c-texto').value}})); $('#c-leer-res').textContent = 'Revisa los campos antes de guardar'; }
+    catch (e) { $('#c-leer-res').textContent = e.message; }
+  };
+  const guardar = async lanzar => {
+    const b = leerCampana();
+    try {
+      if (c) { await api('/api/whop/campanas/' + c.id, {method:'POST', body:b}); campSel = c.id; toast('Campaña guardada'); }
+      else { const r = await api('/api/whop/campanas', {method:'POST', body:{...b, lanzar}}); campSel = r.id; toast(lanzar ? `Campaña creada · ${r.lanzados.length} videos al Clipper` : 'Campaña creada'); }
+      $('#cajon').classList.remove('abierto'); cargarWhop();
+    } catch (e) { toast(e.message); }
+  };
+  $('#c-ok').onclick = () => guardar(false);
+  if (!c) $('#c-ok-lanzar').onclick = () => guardar(true);
+  $('#cajon').classList.add('abierto');
+}
+function rellenarCampana(r){
+  const set = (s, v) => { if (v !== undefined && v !== null && v !== '' && v !== 0) $(s).value = v; };
+  set('#c-nombre', r.nombre); set('#c-marca', r.marca); set('#c-dmin', r.dur_min); set('#c-dmax', r.dur_max); set('#c-cpm', r.cpm);
+  set('#c-tope', r.pago_max_clip); set('#c-vmin', r.vistas_min); set('#c-presu', r.presupuesto); set('#c-fin', r.fecha_fin); set('#c-txt', r.texto_obligatorio); set('#c-notas', r.notas);
+  if (r.material?.length) $('#c-material').value = r.material.join('\n');
+  if (r.hashtags?.length) $('#c-hash').value = r.hashtags.join(' ');
+  if (r.menciones?.length) $('#c-men').value = r.menciones.join(' ');
+  if (r.plataformas?.length) $$('.c-plat').forEach(x => x.checked = r.plataformas.includes(x.value));
+  $('#c-formato').value = r.formato || 'short'; $('#c-auto').checked = !!r.prohibe_automatizado;
+}
+const leerCampana = () => ({
+  nombre: $('#c-nombre').value.trim(), marca: $('#c-marca').value, url_whop: $('#c-url').value, reglas_texto: $('#c-texto').value,
+  material: $('#c-material').value.split(/\s+/).filter(Boolean), plataformas: $$('.c-plat').filter(x => x.checked).map(x => x.value),
+  formato: $('#c-formato').value, dur_min: $('#c-dmin').value, dur_max: $('#c-dmax').value, cpm: $('#c-cpm').value, pago_max_clip: $('#c-tope').value,
+  vistas_min: $('#c-vmin').value, presupuesto: $('#c-presu').value, fecha_fin: $('#c-fin').value, clips_por_video: $('#c-n').value,
+  hashtags: $('#c-hash').value, menciones: $('#c-men').value, texto_obligatorio: $('#c-txt').value, nicho: $('#c-nicho').value,
+  reencuadre: $('#c-reen').value, canal_youtube: $('#c-canal').value, subtitulos: $('#c-subs').checked, intro_narrada: $('#c-intro').checked,
+  prohibe_automatizado: $('#c-auto').checked, notas: $('#c-notas').value,
+});
+
+// ---------- arranque ----------
+(async () => {
+  NICHOS = await api('/api/nichos');
+  let v = 'sala'; try { v = localStorage.getItem('fabrica.vista') || 'sala'; } catch {}
+  ir(TITULOS[v] ? v : 'sala');
+  refrescar(); setInterval(refrescar, 2000);
+})();
+</script>
+</body>
+</html>

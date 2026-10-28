@@ -1,0 +1,23 @@
+[Unit]
+Description=Fabrica de Contenido (panel + trabajador)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fabrica
+Group=fabrica
+WorkingDirectory=/opt/fabrica/app
+Environment=PYTHONUNBUFFERED=1
+Environment=HF_HOME=/opt/fabrica/cache/huggingface
+# Solo escucha en localhost: al panel se entra por túnel SSH (ver README_AZURE.md)
+ExecStart=/opt/fabrica/venv/bin/python fabrica.py panel --host 127.0.0.1 --puerto 5050
+Restart=always
+RestartSec=10
+# Que FFmpeg y Whisper no dejen sin aire al SSH
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+
+[Install]
+WantedBy=multi-user.target

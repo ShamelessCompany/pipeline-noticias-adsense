@@ -1,4 +1,4 @@
-# Pipeline de Noticias Automatizadas - Requisitos
+# Pipeline de Noticias + Fábrica de Contenido (todo gratis)
 playwright>=1.40.0
 edge-tts>=6.1.9
 faster-whisper>=1.0.0
@@ -9,3 +9,10 @@ requests>=2.31.0
 pydantic>=2.0.0
 python-dotenv>=1.0.0
 flask>=3.0.0
+yt-dlp>=2025.1.1
+numpy>=1.26
+# Solo para publicar de verdad en YouTube (modo_publicacion = real)
+google-api-python-client>=2.100.0
+google-auth-oauthlib>=1.2.0
+# Opcional: búsqueda por significado en la biblioteca (descarga modelos CLIP de ~600 MB la primera vez)
+# sentence-transformers>=3.0

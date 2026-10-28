@@ -22,3 +22,12 @@ temp/
 Thumbs.db
 Desktop.ini
 .DS_Store
+
+# Fábrica de Contenido: datos de ejecución y credenciales (no subir nunca)
+data/fabrica.db
+data/ajustes.json
+data/canales/
+data/youtube_token.json
+cookies.txt
+deploy/azure/config.ps1
+assets/biblioteca/
