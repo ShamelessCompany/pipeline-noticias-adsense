@@ -76,6 +76,26 @@ Las etiquetas salen del nombre del archivo y de sus carpetas, así que conviene 
 - **Originales:** menos del 12 % de frases de 5 palabras coincidentes con la referencia (con 25 % o más, bloquea), una extensión mínima, un puntaje de escritura humana de 70 o más y una voz real (no simulada).
 - Por defecto la **aprobación es manual**. YouTube pide que los canales automatizados tengan supervisión humana real. Puedes activar la autoaprobación con un umbral en *Ajustes*, pero lo bloqueado nunca se aprueba solo.
 
+## Campañas de Whop (clipping pagado por vistas)
+
+La pestaña **Whop** sirve para las campañas de Content Rewards, donde una marca o creador pone su material
+y paga por cada 1000 vistas de los clips que publicas en Shorts, TikTok o Reels.
+
+1. **Nueva campaña**: pega el texto de la campaña y pulsa *Leer reglas*. El bot rellena CPM, tope por clip,
+   vistas mínimas, duración, formato, plataformas, hashtags, menciones y enlaces del material. Revisa los campos y guarda.
+2. **Sacar clips**: cada enlace de material (YouTube, Twitch, archivo de Drive, enlace directo a .mp4 o ruta local)
+   va al Clipper, que corta tramos dentro de la duración de la campaña y mete los hashtags, menciones y el texto
+   obligatorio en la descripción y en un caption por plataforma.
+3. **Revisión**: el Revisor añade las reglas de la campaña (duración, formato, hashtags, menciones, campaña activa
+   y que no repita el tramo de otro clip). Los clips de campaña **nunca se aprueban solos**, aunque la aprobación
+   manual esté apagada, porque muchas campañas rechazan clips automatizados o repetitivos.
+4. **Listos para subir**: descarga el video, copia el caption de cada red y publícalo desde la cuenta inscrita
+   en la campaña. *Subir a YouTube* usa el Publicador (modo simulado o real de Ajustes). Pega el enlace publicado y queda registrado.
+5. **Enlaces**: vistas (leídas con yt-dlp o puestas a mano), estimado a cobrar (vistas / 1000 × CPM, con tope
+   y mínimo) y el estado del envío: publicado, enviado a Whop, aprobado, rechazado o pagado.
+
+El envío del enlace en Whop sigue siendo a mano: Whop no tiene una API pública para mandar clips a una campaña.
+
 ## Publicar
 
 Por defecto la publicación es **simulada**: no se sube nada, solo queda anotado qué y cuándo se publicaría.

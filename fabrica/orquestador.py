@@ -43,6 +43,9 @@ def _auto_aprobar(tid: int) -> None:
     t = db.obtener(tid)
     if not t or t["estado"] != "revision" or aj.get("aprobacion_manual", True):
         return
+    if t["datos"].get("campana_id"):
+        # Las campañas de Whop rechazan clips automatizados: siempre los aprueba una persona
+        return
     rev = t["datos"].get("revision", {})
     if rev.get("puntaje", 0) >= int(aj.get("umbral_auto_aprobacion", 85)) and not rev.get("bloqueos"):
         db.actualizar(tid, estado="aprobado", etapa="aprobado automáticamente")

@@ -51,7 +51,7 @@ main{flex:1;display:flex;flex-direction:column;min-width:0}
 .chip.bad{color:var(--bad);border-color:rgba(242,85,90,.3);background:rgba(242,85,90,.08)}
 .chip.info{color:var(--info);border-color:rgba(90,169,255,.3);background:rgba(90,169,255,.08)}
 .chip.acc{color:var(--accent2);border-color:rgba(255,122,69,.35);background:rgba(255,122,69,.1)}
-.btn{border:1px solid var(--line2);background:var(--panel2);padding:8px 14px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13px}
+.btn{text-decoration:none;color:var(--text);border:1px solid var(--line2);background:var(--panel2);padding:8px 14px;border-radius:10px;font-weight:700;cursor:pointer;display:inline-flex;align-items:center;gap:7px;font-size:13px}
 .btn:hover{border-color:var(--muted)}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#1a0d06}
 .btn.pri:hover{background:#ff8f61}
@@ -179,6 +179,32 @@ td input.in,td select.in{padding:6px 8px}
 .cajon .cuerpo{overflow:auto;padding:18px 20px;flex:1}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line2);padding:10px 16px;border-radius:10px;font-weight:600;z-index:30;opacity:0;transition:.25s;pointer-events:none}
 .toast.ver{opacity:1}
+/* whop */
+.whop{display:grid;grid-template-columns:290px minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.whop .kpis{margin:0}
+.camp{padding:11px 12px;border-radius:11px;cursor:pointer;border:1px solid transparent;margin-bottom:6px}
+.camp:hover{background:var(--panel2)}
+.camp.on{background:var(--panel2);border-color:var(--line2)}
+.camp b{display:block;font-size:13.5px;line-height:1.3}
+.camp .m{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.camp .m .chip{font-size:10.5px;padding:1px 7px}
+.flujo{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin:16px 0}
+.flujo div{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px 10px;position:relative}
+.flujo div.act{border-color:rgba(255,122,69,.5)}
+.flujo b{display:block;font-size:19px;font-weight:800;letter-spacing:-.02em}
+.flujo span{font-size:11px;color:var(--muted);font-weight:600}
+.reglas{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.subir{display:grid;grid-template-columns:150px minmax(0,1fr);gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.subir:last-child{border:0}
+.subir video{max-height:260px}
+.subir.h{grid-template-columns:260px minmax(0,1fr)}
+.cap{display:grid;grid-template-columns:110px 1fr auto;gap:8px;align-items:start;margin-top:8px}
+.cap pre{background:var(--bg);border:1px solid var(--line);border-radius:9px;padding:7px 9px;font:12px/1.45 var(--font);white-space:pre-wrap;max-height:96px;overflow:auto;color:#cfd4dd}
+.cap b{font-size:12px;color:var(--muted);padding-top:7px}
+.envio{display:flex;gap:8px;margin-top:10px}
+.envio select.in{width:150px;flex-shrink:0}
+td .in.num{width:90px}
+@media (max-width:1100px){.whop,.subir,.subir.h{grid-template-columns:minmax(0,1fr)}.flujo{grid-template-columns:repeat(3,1fr)}.cap{grid-template-columns:1fr}}
 @media (max-width:1100px){.sala{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(3,1fr)}.rev,.rev-det,.dos,.tres,.lab{grid-template-columns:1fr}}
 @media (max-width:760px){nav{width:62px;padding:14px 8px}.marca div,.nav-item span,.nav-pie{display:none}.top{flex-wrap:wrap;padding:12px 16px}.vista{padding:16px}.kpis{grid-template-columns:repeat(2,1fr)}}
 </style>
@@ -190,6 +216,7 @@ td input.in,td select.in{padding:6px 8px}
   <button class="nav-item" data-v="produccion"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 5h4v14H4zM10 5h4v9h-4zM16 5h4v6h-4z"/></svg><span>Producción</span></button>
   <button class="nav-item" data-v="revision"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg><span>Revisión</span><em class="badge oculto" id="badge-rev">0</em></button>
   <button class="nav-item" data-v="nuevo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg><span>Nuevo trabajo</span></button>
+  <button class="nav-item" data-v="whop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 4l6 6 6-6M6 20l6-6 6 6"/><circle cx="12" cy="12" r="2"/></svg><span>Whop</span><em class="badge oculto" id="badge-whop">0</em></button>
   <div class="nav-sep"></div>
   <button class="nav-item" data-v="nichos"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><span>Nichos</span></button>
   <button class="nav-item" data-v="biblioteca"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><path d="M14 17.5h7M17.5 14v7"/></svg><span>Biblioteca</span></button>
@@ -268,6 +295,24 @@ td input.in,td select.in{padding:6px 8px}
         <textarea class="in" id="n-ori-ins" placeholder="Enfócate en el dato menos conocido. Cierra con una pregunta."></textarea>
         <div class="acciones"><button class="btn pri" id="n-ori-ok">Mandar al Guionista</button></div>
       </div>
+    </div>
+  </section>
+
+  <!-- WHOP -->
+  <section class="vista oculto" id="v-whop">
+    <div class="grid kpis">
+      <div class="card kpi"><div class="n" id="w-k-act">0</div><div class="l">Campañas activas</div></div>
+      <div class="card kpi"><div class="n" id="w-k-rev">0</div><div class="l">Clips para revisar</div></div>
+      <div class="card kpi"><div class="n" id="w-k-sub">0</div><div class="l">Listos para subir</div></div>
+      <div class="card kpi"><div class="n" id="w-k-vis">0</div><div class="l">Vistas de los enlaces</div></div>
+      <div class="card kpi"><div class="n" id="w-k-gan">$0</div><div class="l">Estimado a cobrar</div></div>
+    </div>
+    <div class="whop">
+      <div class="card">
+        <h3 style="display:flex;align-items:center">Campañas<button class="btn sm pri" style="margin-left:auto" onclick="formCampana()">+ Nueva</button></h3>
+        <div id="w-lista"></div>
+      </div>
+      <div class="card" id="w-det"><div class="vacio">Registra una campaña de Whop: pega sus reglas, los enlaces del material y el bot saca los clips siguiendo esas reglas.</div></div>
     </div>
   </section>
 
@@ -398,16 +443,16 @@ const fecha = iso => { try { return new Date(iso).toLocaleString('es',{weekday:'
 const TIPOS = {fuente_clip:'VOD', clip:'Clip', original:'Original'};
 const ESTADO_CHIP = {en_cola:'', procesando:'acc', analizado:'info', revision:'warn', aprobado:'ok', programado:'ok', publicado:'ok', rechazado:'bad', error:'bad', descartado:''};
 const ESTADO_TXT = {en_cola:'En cola', procesando:'Produciendo', analizado:'Analizado', revision:'Para revisar', aprobado:'Aprobado', programado:'Programado', publicado:'Publicado', rechazado:'Rechazado', error:'Error', descartado:'Descartado'};
-let NICHOS = [], vista = 'sala', ultimoEvento = 0, revSel = null;
+let NICHOS = [], vista = 'sala', ultimoEvento = 0, revSel = null, revCampana = false;
 
 // ---------- navegación ----------
-const TITULOS = {sala:'Sala de control', produccion:'Producción', revision:'Revisión', nuevo:'Nuevo trabajo', nichos:'Nichos', biblioteca:'Biblioteca', fuentes:'Fuentes', laboratorio:'Laboratorio de guion', ajustes:'Ajustes'};
+const TITULOS = {sala:'Sala de control', produccion:'Producción', revision:'Revisión', nuevo:'Nuevo trabajo', whop:'Whop · campañas de clipping', nichos:'Nichos', biblioteca:'Biblioteca', fuentes:'Fuentes', laboratorio:'Laboratorio de guion', ajustes:'Ajustes'};
 function ir(v){
   vista = v;
   $$('.nav-item').forEach(b => b.classList.toggle('on', b.dataset.v === v));
   $$('.vista').forEach(s => s.classList.toggle('oculto', s.id !== 'v-' + v));
   $('#titulo-vista').textContent = TITULOS[v];
-  ({produccion: cargarKanban, revision: cargarRevision, nichos: cargarNichos, biblioteca: cargarBiblioteca, fuentes: cargarFuentes, ajustes: cargarAjustes, nuevo: llenarSelects})[v]?.();
+  ({produccion: cargarKanban, revision: cargarRevision, nichos: cargarNichos, biblioteca: cargarBiblioteca, fuentes: cargarFuentes, ajustes: cargarAjustes, nuevo: llenarSelects, whop: cargarWhop})[v]?.();
   try { localStorage.setItem('fabrica.vista', v); } catch {}
 }
 $$('.nav-item').forEach(b => b.onclick = () => ir(b.dataset.v));
@@ -420,6 +465,7 @@ async function refrescar(){
     $('#k-cola').textContent = c.en_cola; $('#k-proc').textContent = c.procesando;
     $('#k-rev').textContent = c.revision; $('#k-prog').textContent = c.programado + c.aprobado; $('#k-pub').textContent = c.publicado;
     const b = $('#badge-rev'); b.textContent = c.revision; b.classList.toggle('oculto', !c.revision);
+    const bw = $('#badge-whop'); bw.textContent = e.whop_listos; bw.classList.toggle('oculto', !e.whop_listos);
     $('#sw-trabajador').checked = e.trabajador; $('#sw-piloto').checked = !!e.piloto_automatico;
     $('#pie-llm').textContent = e.llm.nombre; $('#pie-pub').textContent = e.modo_publicacion;
     pintarAgentes(e.agentes);
@@ -438,6 +484,7 @@ async function refrescar(){
       while (feed.children.length > 250) feed.lastChild.remove();
       if (vista === 'produccion') cargarKanban();
       if (vista === 'revision') cargarRevision(true);
+      if (vista === 'whop') cargarWhop(true);
     }
   } catch (err) { console.warn(err); }
 }
@@ -501,7 +548,7 @@ $('#cajon-x').onclick = () => $('#cajon').classList.remove('abierto');
 const fmtSeg = s => `${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 async function accion(id, acc, body={}){
   await api(`/api/trabajos/${id}/${acc}`, {method:'POST', body});
-  toast({regenerar:'Vuelve a la cola', borrar:'Descartado', aprobar:'Aprobado: el Publicador le busca horario', publicar:'Publicando…', rechazar:'Rechazado', guardar:'Guardado', permiso:'Permiso anotado'}[acc] || 'Hecho');
+  toast({regenerar:'Vuelve a la cola', borrar:'Descartado', aprobar:body.metadatos && revCampana ? 'Aprobado: ya está en Whop › Listos para subir' : 'Aprobado: el Publicador le busca horario', publicar:'Publicando…', rechazar:'Rechazado', guardar:'Guardado', permiso:'Permiso anotado'}[acc] || 'Hecho');
   $('#cajon').classList.remove('abierto');
   refrescar(); if (vista === 'revision') cargarRevision(); if (vista === 'produccion') cargarKanban();
 }
@@ -511,7 +558,7 @@ async function cargarRevision(suave){
   const ts = await api('/api/trabajos?estado=revision');
   $('#rev-lista').innerHTML = ts.map(t => `<div class="it ${t.id === revSel ? 'on' : ''}" onclick="selRev(${t.id})">
       ${t.miniatura ? `<img src="${t.miniatura}">` : ''}<div style="min-width:0"><div style="font-weight:700;font-size:12.5px;line-height:1.3">${esc(t.titulo)}</div>
-      <div class="m" style="display:flex;gap:4px;margin-top:4px"><span class="chip">${TIPOS[t.tipo]}</span><span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span></div></div></div>`).join('')
+      <div class="m" style="display:flex;gap:4px;margin-top:4px"><span class="chip">${TIPOS[t.tipo]}</span>${t.campana_id ? '<span class="chip acc">Whop</span>' : ''}<span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span></div></div></div>`).join('')
     || '<div class="vacio">Nada pendiente 🎉</div>';
   if (!suave && ts.length && !ts.find(t => t.id === revSel)) selRev(ts[0].id);
   if (!ts.length) { revSel = null; $('#rev-det').innerHTML = '<div class="vacio">Cuando un agente termine una pieza aparecerá aquí para que la apruebes, la edites o la mandes a rehacer.</div>'; }
@@ -526,7 +573,7 @@ async function selRev(id){
   $('#rev-det').innerHTML = `
     <div class="rev-det ${t.formato === 'largo' ? 'horizontal' : ''}">
       <div><video src="${t.video_url}" controls playsinline></video>
-        <div class="metr"><span class="chip">${TIPOS[t.tipo]}</span><span class="chip">${esc(nombreNicho(t.nicho))}</span><span class="chip">${t.formato === 'short' ? 'Short 9:16' : 'Largo 16:9'}</span>${d.voz ? `<span class="chip">${esc(d.voz)}</span>` : ''}</div>
+        <div class="metr"><span class="chip">${TIPOS[t.tipo]}</span><span class="chip">${esc(nombreNicho(t.nicho))}</span><span class="chip">${t.formato === 'short' ? 'Short 9:16' : 'Largo 16:9'}</span>${d.campana_id ? `<span class="chip acc">Campaña Whop #${d.campana_id}</span>` : ''}${d.voz ? `<span class="chip">${esc(d.voz)}</span>` : ''}</div>
       </div>
       <div>
         ${r.bloqueos.length ? `<div class="aviso-blq"><b>Bloqueado para publicar:</b> ${r.bloqueos.map(esc).join(', ')}. Puedes corregirlo y regenerar, o aprobar bajo tu responsabilidad.</div>` : ''}
@@ -544,15 +591,16 @@ async function selRev(id){
         ${d.transcripcion ? `<label class="campo">Lo que se dice en el clip</label><div class="texto-largo">${esc(d.transcripcion)}</div>` : ''}
         <label class="campo">Si lo mandas a rehacer, ¿qué cambio?</label><input class="in" id="r-ins" placeholder="Más corto, otro gancho, menos tecnicismos…">
         <div class="acciones">
+          ${d.campana_id ? `<button class="btn ok" onclick="aprobar(${id},'aprobar')">Aprobar: pasa a Whop para subir</button>` : `
           <button class="btn ok" onclick="aprobar(${id},'aprobar')">Aprobar y programar</button>
-          <button class="btn" onclick="aprobar(${id},'publicar')">Aprobar y publicar ya</button>
+          <button class="btn" onclick="aprobar(${id},'publicar')">Aprobar y publicar ya</button>`}
           <button class="btn" onclick="accion(${id},'guardar',{metadatos:metaForm()})">Guardar cambios</button>
           <button class="btn" onclick="accion(${id},'regenerar',{instrucciones:$('#r-ins').value})">Rehacer</button>
           <button class="btn bad" onclick="accion(${id},'rechazar',{motivo:$('#r-ins').value || 'rechazado en revisión'})">Rechazar</button>
         </div>
       </div>
     </div>`;
-  window._bloqueos = r.bloqueos;
+  window._bloqueos = r.bloqueos; revCampana = !!d.campana_id;
 }
 const INSERTO_TXT = {cifra:'Cifra', imagen:'Foto', lugar:'Lugar', palabra:'Palabra', rotulo:'Rótulo', cita:'Cita'};
 function pintarMontaje(d){
@@ -739,6 +787,228 @@ $('#aj-save').onclick = async () => {
     max_trabajos_por_ciclo:+$('#aj-max').value, whisper_modelo:$('#aj-whisper').value, modo_publicacion:$('#aj-modo').value, privacidad_publicacion:$('#aj-priv').value}});
   toast('Ajustes guardados');
 };
+
+// ---------- whop ----------
+let WHOP = {campanas: [], plataformas: {}}, campSel = null;
+const ENVIO_TXT = {publicado:'Publicado', enviado:'Enviado a Whop', aprobado:'Aprobado por la marca', rechazado:'Rechazado', pagado:'Pagado'};
+const ENVIO_CHIP = {publicado:'', enviado:'info', aprobado:'ok', rechazado:'bad', pagado:'ok'};
+const dinero = n => '$' + (+n || 0).toLocaleString('es', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+const miles = n => (+n || 0).toLocaleString('es');
+const nomPlat = p => (WHOP.plataformas[p] || {}).nombre || p;
+const escribiendo = () => document.activeElement && $('#v-whop').contains(document.activeElement) && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
+
+async function cargarWhop(suave){
+  if (suave && escribiendo()) return;
+  WHOP = await api('/api/whop/campanas');
+  const cs = WHOP.campanas, act = cs.filter(c => c.estado === 'activa');
+  const sum = k => cs.reduce((a, c) => a + (c.resumen[k] || 0), 0);
+  $('#w-k-act').textContent = act.length; $('#w-k-rev').textContent = sum('revision'); $('#w-k-sub').textContent = sum('listos');
+  $('#w-k-vis').textContent = miles(sum('vistas')); $('#w-k-gan').textContent = dinero(sum('estimado'));
+  $('#w-lista').innerHTML = cs.map(c => `<div class="camp ${c.id === campSel ? 'on' : ''}" onclick="selCampana(${c.id})">
+      <b>${esc(c.nombre)}</b><div class="hint" style="margin:2px 0 0">${esc(c.datos.marca || 'Sin marca')}${c.datos.cpm ? ' · ' + dinero(c.datos.cpm) + ' / 1000 vistas' : ''}</div>
+      <div class="m"><span class="chip ${c.estado === 'activa' ? (c.resumen.vencida ? 'warn' : 'ok') : ''}">${c.resumen.vencida ? 'vencida' : c.estado}</span>
+      ${c.resumen.revision ? `<span class="chip warn">${c.resumen.revision} revisar</span>` : ''}${c.resumen.listos ? `<span class="chip acc">${c.resumen.listos} subir</span>` : ''}
+      ${c.resumen.enlaces ? `<span class="chip">${c.resumen.enlaces} enlaces</span>` : ''}</div></div>`).join('')
+    || '<div class="vacio">Aún no hay campañas</div>';
+  if (campSel && cs.find(c => c.id === campSel)) selCampana(campSel, true);
+  else if (!suave && cs.length) selCampana((act[0] || cs[0]).id);
+}
+
+async function selCampana(id, suave){
+  if (suave && escribiendo()) return;
+  campSel = id;
+  $$('#w-lista .camp').forEach(e => e.classList.toggle('on', e.getAttribute('onclick') === `selCampana(${id})`));
+  const c = await api('/api/whop/campanas/' + id), d = c.datos, r = c.resumen;
+  const fuentes = c.clips.filter(t => t.tipo === 'fuente_clip'), clips = c.clips.filter(t => t.tipo === 'clip');
+  const listos = clips.filter(t => t.por_subir);
+  const enRev = clips.filter(t => t.estado === 'revision');
+  const enCurso = c.clips.filter(t => ['en_cola','procesando','error'].includes(t.estado));
+  const pasos = [['Material', r.material], ['Produciendo', r.produciendo], ['Para revisar', r.revision], ['Listos para subir', r.listos], ['Enlaces', r.enlaces], ['Cobrado', dinero(r.cobrado)]];
+  $('#w-det').innerHTML = `
+    <div style="display:flex;gap:10px;align-items:flex-start;flex-wrap:wrap">
+      <div style="flex:1;min-width:220px"><div style="font-size:18px;font-weight:800;letter-spacing:-.02em">${esc(c.nombre)}</div>
+        <div class="hint" style="margin:2px 0 0">${esc(d.marca || 'Sin marca')}${d.fecha_fin ? ' · termina ' + esc(d.fecha_fin) : ''}${d.url_whop ? ` · <a href="${esc(d.url_whop)}" target="_blank" rel="noopener">abrir en Whop</a>` : ''}</div></div>
+      <button class="btn sm" onclick="formCampana(${c.id})">Editar reglas</button>
+      <button class="btn sm" onclick="estadoCampana(${c.id}, '${c.estado === 'activa' ? 'pausada' : 'activa'}')">${c.estado === 'activa' ? 'Pausar' : 'Reactivar'}</button>
+      ${c.estado !== 'cerrada' ? `<button class="btn sm bad" onclick="estadoCampana(${c.id}, 'cerrada')">Cerrar</button>` : ''}
+    </div>
+    <div class="reglas">
+      <span class="chip ${c.estado === 'activa' && !r.vencida ? 'ok' : 'warn'}">${r.vencida ? 'vencida' : c.estado}</span>
+      <span class="chip acc">${d.cpm ? dinero(d.cpm) + ' / 1000 vistas' : 'CPM sin definir'}</span>
+      ${d.pago_max_clip ? `<span class="chip">tope ${dinero(d.pago_max_clip)} por clip</span>` : ''}${d.vistas_min ? `<span class="chip">mínimo ${miles(d.vistas_min)} vistas</span>` : ''}
+      <span class="chip">${d.formato === 'short' ? 'Vertical 9:16' : 'Horizontal 16:9'}</span><span class="chip">${d.dur_min}-${d.dur_max} s</span>
+      ${d.plataformas.map(p => `<span class="chip info">${esc(nomPlat(p))}</span>`).join('')}
+      ${d.hashtags.map(h => `<span class="chip">${esc(h)}</span>`).join('')}${d.menciones.map(m => `<span class="chip">${esc(m)}</span>`).join('')}
+    </div>
+    ${d.texto_obligatorio ? `<p class="hint">Texto obligatorio: «${esc(d.texto_obligatorio)}»</p>` : ''}
+    ${d.prohibe_automatizado ? `<div class="aviso-blq" style="margin-top:12px">Esta campaña no admite clips automatizados o repetitivos. Mira cada clip entero, cambia el título y el caption a mano y no subas dos tramos parecidos.</div>` : ''}
+    ${d.notas ? `<p class="hint">${esc(d.notas)}</p>` : ''}
+    <div class="flujo">${pasos.map(([l, n], i) => `<div class="${(i === 2 && r.revision) || (i === 3 && r.listos) ? 'act' : ''}"><b>${n}</b><span>${l}</span></div>`).join('')}</div>
+
+    <label class="campo">Material de la campaña</label>
+    ${fuentes.length ? fuentes.map(t => `<div class="fila-curso" style="padding:7px 0"><div style="flex:1;min-width:0"><div style="font-weight:700;font-size:12.5px;cursor:pointer" onclick="abrirTrabajo(${t.id})">#${t.id} · ${esc(t.titulo)}</div>
+        <div class="hint" style="margin:1px 0 0">${esc(t.etapa || ESTADO_TXT[t.estado])}</div>${t.estado === 'procesando' ? `<div class="barra"><i style="width:${t.progreso}%"></i></div>` : ''}</div>
+        <span class="chip ${ESTADO_CHIP[t.estado]}">${ESTADO_TXT[t.estado]}</span></div>`).join('') : '<div class="hint">Todavía no se mandó material al Clipper.</div>'}
+    ${d.material.filter(u => !fuentes.find(t => t.fuente_url === u)).map(u => `<div class="hint" style="word-break:break-all">Sin lanzar: ${esc(u)}</div>`).join('')}
+    <div class="envio"><textarea class="in" id="w-mat" style="min-height:44px" placeholder="Enlaces del material (YouTube, Twitch, Drive de un archivo, enlace directo a .mp4), uno por línea"></textarea>
+      <button class="btn pri" onclick="lanzarMaterial(${c.id})" ${c.estado !== 'activa' ? 'disabled' : ''}>Sacar clips</button></div>
+    <p class="hint">El Clipper corta tramos de ${d.dur_min}-${d.dur_max} s, ${d.clips_por_video} por video, ${d.subtitulos ? 'con subtítulos' : 'sin subtítulos'}${d.intro_narrada ? ' e intro narrada' : ''}. De una carpeta de Drive, pega el enlace de cada archivo.</p>
+
+    ${enCurso.length ? `<label class="campo">En producción</label>` + enCurso.filter(t => t.tipo === 'clip').map(tarjeta).join('') : ''}
+
+    <label class="campo">Para revisar (${enRev.length})</label>
+    ${enRev.map(t => `<div class="fila-curso" style="padding:7px 0">${t.miniatura ? `<img src="${t.miniatura}" style="width:34px;height:48px;border-radius:6px;object-fit:cover">` : ''}
+        <div style="flex:1;min-width:0;font-weight:700;font-size:12.5px">${esc(t.titulo)}<div class="hint" style="margin:1px 0 0">${fmtSeg(t.inicio || 0)} – ${fmtSeg(t.fin || 0)}${t.bloqueos.length ? ' · bloqueos: ' + esc(t.bloqueos.join(', ')) : ''}</div></div>
+        <span class="chip ${t.bloqueos.length ? 'bad' : t.puntaje >= 80 ? 'ok' : 'warn'}">${t.puntaje}</span><button class="btn sm" onclick="ir('revision');selRev(${t.id})">Revisar</button></div>`).join('')
+      || '<div class="hint">Nada pendiente. Los clips de campaña nunca se aprueban solos.</div>'}
+
+    <label class="campo">Listos para subir (${listos.length})</label>
+    ${listos.map(t => clipParaSubir(t, c)).join('') || '<div class="hint">Cuando apruebes un clip en Revisión aparecerá aquí con su video, su caption para cada red y un hueco para pegar el enlace publicado.</div>'}
+
+    <label class="campo" style="display:flex;align-items:center">Enlaces enviados a la campaña
+      <button class="btn sm" style="margin-left:auto" onclick="todasLasVistas()">Actualizar vistas</button></label>
+    ${c.envios.length ? `<div style="overflow-x:auto"><table><thead><tr><th>Red</th><th>Enlace</th><th>Vistas</th><th>Estimado</th><th>Estado</th><th>Pagado</th><th></th></tr></thead><tbody>
+      ${c.envios.map(e => `<tr><td><span class="chip info">${esc(nomPlat(e.plataforma))}</span></td>
+        <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="${esc(e.url)}" target="_blank" rel="noopener">${esc(e.url.replace(/^https?:\/\/(www\.)?/, ''))}</a>${e.trabajo_id ? ` <span class="ev"><span class="lnk" onclick="abrirTrabajo(${e.trabajo_id})">#${e.trabajo_id}</span></span>` : ''}</td>
+        <td><input class="in num" type="number" min="0" value="${e.vistas}" onchange="editarEnvio(${e.id}, {vistas:this.value})" title="${e.vistas_actualizadas ? 'Leídas ' + fecha(e.vistas_actualizadas) : 'Puestas a mano'}"></td>
+        <td>${dinero(e.estimado)}</td>
+        <td><select class="in" onchange="editarEnvio(${e.id}, {estado:this.value})">${Object.entries(ENVIO_TXT).map(([k, v]) => `<option value="${k}" ${k === e.estado ? 'selected' : ''}>${v}</option>`).join('')}</select></td>
+        <td><input class="in num" type="number" min="0" step="0.01" value="${e.pago || ''}" placeholder="0" onchange="editarEnvio(${e.id}, {pago:this.value})"></td>
+        <td style="white-space:nowrap"><button class="btn sm" title="Leer vistas" onclick="leerVistas(${e.id})">↻</button> <button class="btn sm bad" title="Quitar" onclick="borrarEnvio(${e.id})">×</button></td></tr>`).join('')}
+      </tbody></table></div>
+      <p class="hint">Estimado = vistas / 1000 × CPM${d.pago_max_clip ? ', con tope por clip' : ''}${d.vistas_min ? `, desde ${miles(d.vistas_min)} vistas` : ''}. Cuando mandes el enlace en Whop cambia el estado a «Enviado».</p>`
+    : '<div class="hint">Todavía no hay enlaces.</div>'}
+    <div class="envio"><input class="in" id="w-link" placeholder="Pegar un enlace publicado que no salió de la fábrica">
+      <button class="btn" onclick="registrarEnlace(${c.id}, null, '#w-link')">Añadir</button></div>`;
+}
+
+function clipParaSubir(t, c){
+  const caps = t.metadatos.captions || {}, d = c.datos;
+  return `<div class="subir ${t.formato === 'largo' ? 'h' : ''}">
+    <div>${t.video_url ? `<video src="${t.video_url}" controls playsinline preload="metadata"></video>` : ''}
+      <div class="acciones" style="margin-top:8px"><a class="btn sm" href="${t.video_url}" download="whop_${c.id}_${t.id}.mp4">Descargar</a></div></div>
+    <div style="min-width:0">
+      <div style="font-weight:800">${esc(t.metadatos.titulo || t.titulo)}</div>
+      ${d.plataformas.map(p => `<div class="cap"><b>${esc(nomPlat(p))}</b><pre id="cap-${t.id}-${p}">${esc(p === 'youtube' ? (t.metadatos.titulo || '') + '\n\n' + (caps[p] || t.metadatos.descripcion || '') : caps[p] || '')}</pre>
+        <button class="btn sm" onclick="copiar('#cap-${t.id}-${p}')">Copiar</button></div>`).join('')}
+      ${t.enlaces.length ? `<div class="metr">${t.enlaces.map(e => `<span class="chip ok">${esc(nomPlat(e.plataforma))} ✓</span>`).join('')}</div>` : ''}
+      <div class="envio"><input class="in" id="lnk-${t.id}" placeholder="Pega aquí el enlace cuando lo publiques">
+        <button class="btn ok" onclick="registrarEnlace(${c.id}, ${t.id}, '#lnk-${t.id}')">Registrar</button>
+        ${d.plataformas.includes('youtube') && !t.enlaces.find(e => e.plataforma === 'youtube') ? `<button class="btn" onclick="subirYoutube(${t.id})">Subir a YouTube</button>` : ''}</div>
+    </div></div>`;
+}
+
+async function copiar(sel){
+  const txt = $(sel).textContent;
+  try { await navigator.clipboard.writeText(txt); toast('Copiado'); }
+  catch { const r = document.createRange(); r.selectNodeContents($(sel)); getSelection().removeAllRanges(); getSelection().addRange(r); toast('Seleccionado: pulsa Ctrl+C'); }
+}
+async function lanzarMaterial(id){
+  const urls = $('#w-mat').value.split(/\s+/).filter(Boolean);
+  try { const r = await api(`/api/whop/campanas/${id}/material`, {method:'POST', body:{urls}});
+    toast(r.lanzados.length ? `${r.lanzados.length} videos al Clipper` : 'Ese material ya estaba lanzado'); $('#w-mat').value = ''; cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function registrarEnlace(cid, tid, sel){
+  const url = $(sel).value.trim(); if (!url) return toast('Pega el enlace');
+  try { await api('/api/whop/envios', {method:'POST', body:{campana_id:cid, trabajo_id:tid, url}}); toast('Enlace registrado'); $(sel).value = ''; cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function subirYoutube(tid){
+  if (!confirm('Se sube con el modo de publicación de Ajustes (simulado o real) al canal de la campaña o del nicho. ¿Seguir?')) return;
+  try { const r = await api(`/api/whop/clips/${tid}/youtube`, {method:'POST'}); toast(r.url ? 'Subido: ' + r.url : (r.mensaje || r.error || r.estado)); cargarWhop(); }
+  catch (e) { toast(e.message); }
+}
+async function editarEnvio(id, body){ try { await api('/api/whop/envios/' + id, {method:'POST', body}); cargarWhop(); } catch (e) { toast(e.message); } }
+async function borrarEnvio(id){ if (!confirm('¿Quitar este enlace?')) return; await api('/api/whop/envios/' + id, {method:'DELETE'}); cargarWhop(); }
+async function leerVistas(id){ try { const r = await api(`/api/whop/envios/${id}/vistas`, {method:'POST'}); toast(miles(r.vistas) + ' vistas'); cargarWhop(); } catch (e) { toast(e.message); } }
+async function todasLasVistas(){ await api('/api/whop/vistas', {method:'POST'}); toast('Leyendo vistas de todos los enlaces en segundo plano'); setTimeout(cargarWhop, 8000); }
+async function estadoCampana(id, estado){
+  if (estado === 'cerrada' && !confirm('¿Cerrar la campaña? Los clips y enlaces se quedan guardados.')) return;
+  await api('/api/whop/campanas/' + id, {method:'POST', body:{estado}}); cargarWhop();
+}
+
+// formulario de campaña (en el cajón lateral)
+function formCampana(id){
+  const c = WHOP.campanas.find(x => x.id === id), d = c ? c.datos : {plataformas:['youtube','tiktok','instagram'], formato:'short', dur_min:15, dur_max:60, clips_por_video:4, subtitulos:true, reencuadre:'desenfoque'};
+  const v = k => esc(d[k] ?? '');
+  $('#cajon-tit').textContent = c ? 'Editar campaña' : 'Nueva campaña de Whop';
+  $('#cajon-cuerpo').innerHTML = `
+    <label class="campo">Pega aquí la página de la campaña (reglas, pagos, enlaces)</label>
+    <textarea class="in" id="c-texto" style="min-height:110px" placeholder="Copia todo el texto de la campaña en Whop y pégalo: el bot rellena los campos.">${v('reglas_texto')}</textarea>
+    <div class="acciones" style="margin-top:8px"><button class="btn" id="c-leer">Leer reglas</button><span class="hint" id="c-leer-res" style="margin:0;align-self:center"></span></div>
+    <label class="campo">Nombre</label><input class="in" id="c-nombre" value="${esc(c ? c.nombre : '')}" placeholder="Clips del podcast X">
+    <div class="grid dos" style="gap:12px">
+      <div><label class="campo">Marca o creador</label><input class="in" id="c-marca" value="${v('marca')}"></div>
+      <div><label class="campo">Enlace de la campaña en Whop</label><input class="in" id="c-url" value="${v('url_whop')}" placeholder="https://whop.com/..."></div>
+    </div>
+    <label class="campo">Material fuente (un enlace por línea)</label>
+    <textarea class="in" id="c-material" style="min-height:70px" placeholder="https://www.youtube.com/watch?v=...&#10;https://drive.google.com/file/d/...">${esc((d.material || []).join('\n'))}</textarea>
+    <label class="campo">Plataformas</label>
+    <div class="metr">${Object.entries(WHOP.plataformas).map(([k, p]) => `<label class="chk" style="margin:0 10px 0 0"><input type="checkbox" class="c-plat" value="${k}" ${(d.plataformas || []).includes(k) ? 'checked' : ''}><span>${esc(p.nombre)}</span></label>`).join('')}</div>
+    <div class="grid tres" style="gap:12px">
+      <div><label class="campo">Formato</label><select class="in" id="c-formato"><option value="short" ${d.formato !== 'largo' ? 'selected' : ''}>Vertical 9:16</option><option value="largo" ${d.formato === 'largo' ? 'selected' : ''}>Horizontal 16:9</option></select></div>
+      <div><label class="campo">Duración mínima (s)</label><input class="in" type="number" id="c-dmin" value="${v('dur_min')}"></div>
+      <div><label class="campo">Duración máxima (s)</label><input class="in" type="number" id="c-dmax" value="${v('dur_max')}"></div>
+      <div><label class="campo">CPM ($ por 1000 vistas)</label><input class="in" type="number" step="0.01" id="c-cpm" value="${v('cpm')}"></div>
+      <div><label class="campo">Tope por clip ($)</label><input class="in" type="number" step="0.01" id="c-tope" value="${v('pago_max_clip')}"></div>
+      <div><label class="campo">Vistas mínimas</label><input class="in" type="number" id="c-vmin" value="${v('vistas_min')}"></div>
+      <div><label class="campo">Presupuesto total ($)</label><input class="in" type="number" step="0.01" id="c-presu" value="${v('presupuesto')}"></div>
+      <div><label class="campo">Termina el</label><input class="in" type="date" id="c-fin" value="${v('fecha_fin')}"></div>
+      <div><label class="campo">Clips por video</label><input class="in" type="number" min="1" max="15" id="c-n" value="${v('clips_por_video')}"></div>
+    </div>
+    <label class="campo">Hashtags obligatorios</label><input class="in" id="c-hash" value="${esc((d.hashtags || []).join(' '))}" placeholder="#marca #clip">
+    <label class="campo">Menciones obligatorias</label><input class="in" id="c-men" value="${esc((d.menciones || []).join(' '))}" placeholder="@marca">
+    <label class="campo">Texto obligatorio en la descripción o caption</label><input class="in" id="c-txt" value="${v('texto_obligatorio')}" placeholder="Link en mi perfil">
+    <div class="grid dos" style="gap:12px">
+      <div><label class="campo">Nicho (estilo de títulos y subtítulos)</label><select class="in" id="c-nicho">${NICHOS.map(n => `<option value="${n.id}" ${n.id === d.nicho ? 'selected' : ''}>${esc(n.nombre)}</option>`).join('')}</select></div>
+      <div><label class="campo">Reencuadre</label><select class="in" id="c-reen"><option value="desenfoque">Fondo desenfocado</option><option value="recorte" ${d.reencuadre === 'recorte' ? 'selected' : ''}>Recortar al centro</option></select></div>
+      <div><label class="campo">Canal de YouTube (alias)</label><input class="in" id="c-canal" value="${v('canal_youtube')}" placeholder="el del nicho"></div>
+    </div>
+    <label class="chk"><input type="checkbox" id="c-subs" ${d.subtitulos !== false ? 'checked' : ''}><span>Quemar subtítulos</span></label>
+    <label class="chk"><input type="checkbox" id="c-intro" ${d.intro_narrada ? 'checked' : ''}><span>Intro narrada con voz sintética <span class="hint">Muchas campañas no la quieren: déjala apagada salvo que la pidan.</span></span></label>
+    <label class="chk"><input type="checkbox" id="c-auto" ${d.prohibe_automatizado ? 'checked' : ''}><span>La campaña prohíbe clips automatizados o repetitivos <span class="hint">Se recuerda en cada revisión. Igualmente ningún clip de campaña se aprueba solo.</span></span></label>
+    <label class="campo">Notas</label><textarea class="in" id="c-notas" style="min-height:60px">${v('notas')}</textarea>
+    <div class="acciones">
+      <button class="btn pri" id="c-ok">${c ? 'Guardar' : 'Crear campaña'}</button>
+      ${c ? '' : '<button class="btn" id="c-ok-lanzar">Crear y sacar clips</button>'}
+    </div>`;
+  $('#c-leer').onclick = async () => {
+    $('#c-leer-res').textContent = 'Leyendo…';
+    try { rellenarCampana(await api('/api/whop/reglas', {method:'POST', body:{texto:$('#c-texto').value}})); $('#c-leer-res').textContent = 'Revisa los campos antes de guardar'; }
+    catch (e) { $('#c-leer-res').textContent = e.message; }
+  };
+  const guardar = async lanzar => {
+    const b = leerCampana();
+    try {
+      if (c) { await api('/api/whop/campanas/' + c.id, {method:'POST', body:b}); campSel = c.id; toast('Campaña guardada'); }
+      else { const r = await api('/api/whop/campanas', {method:'POST', body:{...b, lanzar}}); campSel = r.id; toast(lanzar ? `Campaña creada · ${r.lanzados.length} videos al Clipper` : 'Campaña creada'); }
+      $('#cajon').classList.remove('abierto'); cargarWhop();
+    } catch (e) { toast(e.message); }
+  };
+  $('#c-ok').onclick = () => guardar(false);
+  if (!c) $('#c-ok-lanzar').onclick = () => guardar(true);
+  $('#cajon').classList.add('abierto');
+}
+function rellenarCampana(r){
+  const set = (s, v) => { if (v !== undefined && v !== null && v !== '' && v !== 0) $(s).value = v; };
+  set('#c-nombre', r.nombre); set('#c-marca', r.marca); set('#c-dmin', r.dur_min); set('#c-dmax', r.dur_max); set('#c-cpm', r.cpm);
+  set('#c-tope', r.pago_max_clip); set('#c-vmin', r.vistas_min); set('#c-presu', r.presupuesto); set('#c-fin', r.fecha_fin); set('#c-txt', r.texto_obligatorio); set('#c-notas', r.notas);
+  if (r.material?.length) $('#c-material').value = r.material.join('\n');
+  if (r.hashtags?.length) $('#c-hash').value = r.hashtags.join(' ');
+  if (r.menciones?.length) $('#c-men').value = r.menciones.join(' ');
+  if (r.plataformas?.length) $$('.c-plat').forEach(x => x.checked = r.plataformas.includes(x.value));
+  $('#c-formato').value = r.formato || 'short'; $('#c-auto').checked = !!r.prohibe_automatizado;
+}
+const leerCampana = () => ({
+  nombre: $('#c-nombre').value.trim(), marca: $('#c-marca').value, url_whop: $('#c-url').value, reglas_texto: $('#c-texto').value,
+  material: $('#c-material').value.split(/\s+/).filter(Boolean), plataformas: $$('.c-plat').filter(x => x.checked).map(x => x.value),
+  formato: $('#c-formato').value, dur_min: $('#c-dmin').value, dur_max: $('#c-dmax').value, cpm: $('#c-cpm').value, pago_max_clip: $('#c-tope').value,
+  vistas_min: $('#c-vmin').value, presupuesto: $('#c-presu').value, fecha_fin: $('#c-fin').value, clips_por_video: $('#c-n').value,
+  hashtags: $('#c-hash').value, menciones: $('#c-men').value, texto_obligatorio: $('#c-txt').value, nicho: $('#c-nicho').value,
+  reencuadre: $('#c-reen').value, canal_youtube: $('#c-canal').value, subtitulos: $('#c-subs').checked, intro_narrada: $('#c-intro').checked,
+  prohibe_automatizado: $('#c-auto').checked, notas: $('#c-notas').value,
+});
 
 // ---------- arranque ----------
 (async () => {

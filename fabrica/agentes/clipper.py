@@ -14,7 +14,7 @@ import statistics
 from pathlib import Path
 from typing import Dict, List
 
-from fabrica import db, llm, media, fuentes, subtitulos, metadatos, cumplimiento
+from fabrica import db, llm, media, fuentes, subtitulos, metadatos, cumplimiento, whop
 from fabrica.agentes import ocupado, libre
 from fabrica.ajustes import TRABAJOS_DIR, FORMATOS, obtener_nicho
 
@@ -124,11 +124,17 @@ def analizar_fuente(t: Dict) -> None:
     fmt = FORMATOS[t["formato"]]
     carpeta = _carpeta(tid)
     dmin, dmax = (fmt["seg_min"], fmt["seg_max"]) if t["formato"] == "short" else (60, 240)
+    camp = whop.de_trabajo(t)
+    if camp:
+        # Material de una campaña de Whop: duración y número de clips los marca la campaña
+        nicho = whop.ajustar_nicho(nicho, camp)
+        dmin, dmax = whop.duraciones(camp)
 
     ocupado("clipper", f"Leyendo la fuente {url[:70]}", tid)
     es_local = Path(url).exists()
     info = {"titulo": Path(url).stem, "canal": "archivo local", "url": url} if es_local else fuentes.info_video(url)
-    db.actualizar(tid, titulo=info["titulo"][:140], etapa="descargando", progreso=10)
+    db.actualizar(tid, titulo=(f"[{camp['nombre'][:40]}] " if camp else "") + info["titulo"][:140],
+                  etapa="descargando", progreso=10)
 
     ocupado("clipper", f"Descargando «{info['titulo'][:60]}»", tid)
     video = carpeta / "fuente.mp4"
@@ -172,7 +178,8 @@ def analizar_fuente(t: Dict) -> None:
                    "fuente_info": info, "video_fuente": str(video),
                    "transcripcion": _texto_en(segs, c["inicio"], c["fin"]),
                    "segmentos": [s for s in segs if s["fin"] > c["inicio"] and s["inicio"] < c["fin"]],
-                   "permiso_manual": t["datos"].get("permiso_manual", False)})
+                   "permiso_manual": t["datos"].get("permiso_manual", False),
+                   **({"campana_id": camp["id"]} if camp else {})})
         db.registrar("Clipper", f"Momento {c['inicio']:.0f}s-{c['fin']:.0f}s puntaje {c['puntaje']} "
                                 f"({c.get('categoria', 'sin categoría')}) → trabajo #{hijo}", tid)
     db.fusionar_datos(tid, fuente_info=info, candidatos=cands, motor_transcripcion=motor_trans,
@@ -188,6 +195,9 @@ def producir_clip(t: Dict) -> None:
     fmt = FORMATOS[t["formato"]]
     carpeta = _carpeta(tid)
     info, momento = d.get("fuente_info", {}), d.get("momento", {})
+    camp = whop.de_trabajo(t)
+    if camp:
+        nicho = whop.ajustar_nicho(nicho, camp)
 
     ocupado("clipper", f"Recortando {d['inicio']:.0f}s-{d['fin']:.0f}s", tid)
     if Path(d["video_fuente"]).exists():
@@ -206,16 +216,22 @@ def producir_clip(t: Dict) -> None:
         palabras = r["palabras"]
     else:
         palabras = []
+    quiere_subs = camp["datos"]["subtitulos"] if camp else True
     ass = subtitulos.escribir_ass(palabras, str(carpeta / "subs.ass"), fmt["ancho"], fmt["alto"],
-                                  color=nicho.get("color_subtitulos", "amarillo")) if palabras else None
+                                  color=nicho.get("color_subtitulos", "amarillo")) if palabras and quiere_subs else None
     libre("locutor")
 
     ocupado("empaquetador", "Decidiendo título, descripción y tags", tid)
     creditos = [f"Clip de {info.get('canal', 'creador original')}: {info.get('url', t['fuente_url'])}",
                 "Fuente usada con permiso del creador." if cumplimiento.fuente_permitida(t["fuente_url"])["permite_clips"] else ""]
+    if camp:
+        canal = info.get("canal") if info.get("canal") != "archivo local" else ""
+        creditos = [f"Clip de {camp['datos']['marca'] or canal or camp['nombre']}"]
     contenido = " ".join(x for x in (momento.get("contexto", ""), d.get("transcripcion", "")) if x)
     meta = metadatos.generar(contenido or info.get("titulo", ""), nicho, t["formato"], [c for c in creditos if c],
                              _formulas(t["nicho"]), pista_titulo=momento.get("titulo") or t["titulo"])
+    if camp:
+        meta = whop.aplicar_metadatos(meta, camp)
     libre("empaquetador")
     db.actualizar(tid, etapa="narrando contexto", progreso=50)
 
@@ -238,6 +254,8 @@ def producir_clip(t: Dict) -> None:
     datos_rev = {"duracion": media.duracion(final), "titulo_overlay": gancho, "subtitulos": bool(ass),
                  "intro_narrada": bool(intro)}
     rev = cumplimiento.revisar_clip(datos_rev, meta, t["fuente_url"], d.get("permiso_manual", False))
+    if camp:
+        rev = whop.revisar(rev, camp, meta, t, datos_rev["duracion"], fmt["ancho"], fmt["alto"])
     libre("revisor", f"Puntaje {rev['puntaje']}/100" + (f", bloqueos: {', '.join(rev['bloqueos'])}" if rev["bloqueos"] else ""),
           tid, "ok" if not rev["bloqueos"] else "aviso")
     db.fusionar_datos(tid, video=str(final), miniatura=str(carpeta / "mini.jpg"), metadatos=meta,

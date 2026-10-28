@@ -37,6 +37,9 @@ def _siguiente_hueco(nicho: Dict) -> str:
 def programar_aprobados() -> int:
     n = 0
     for t in db.listar("aprobado"):
+        if t["datos"].get("campana_id"):
+            # Los clips de Whop se suben desde la pestaña Whop, a la cuenta que está inscrita en la campaña
+            continue
         nicho = obtener_nicho(t["nicho"])
         slot = _siguiente_hueco(nicho)
         db.actualizar(t["id"], estado="programado", programado_para=slot, etapa=f"sale {slot[:16].replace('T', ' ')}")
@@ -59,7 +62,9 @@ def publicar(t: Dict) -> Dict:
     ajustes = cargar_ajustes()
     meta = t["datos"].get("metadatos", {})
     video = t["datos"].get("video")
-    canal = obtener_nicho(t["nicho"]).get("canal_youtube") or "principal"
+    from fabrica import whop
+    camp = whop.de_trabajo(t)
+    canal = (camp and camp["datos"].get("canal_youtube")) or obtener_nicho(t["nicho"]).get("canal_youtube") or "principal"
     ocupado("publicador", f"Publicando «{meta.get('titulo', t['titulo'])[:60]}» en {canal}", t["id"])
     try:
         if ajustes.get("modo_publicacion") == "real":
@@ -69,6 +74,8 @@ def publicar(t: Dict) -> Dict:
         res["canal"] = canal
         db.fusionar_datos(t["id"], publicacion=res)
         db.actualizar(t["id"], estado="publicado", etapa=res["estado"])
+        if camp and res.get("url"):
+            whop.registrar_envio(camp["id"], res["url"], t["id"], "youtube")
         libre("publicador", f"{res['estado']}: {res.get('url') or res.get('mensaje', '')}", t["id"])
         return res
     except Exception as e:

@@ -15,7 +15,7 @@ from flask import Flask, Response, jsonify, request, render_template, send_from_
 ROOT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT_DIR))
 
-from fabrica import db, llm, estilo, orquestador, canales, biblioteca
+from fabrica import db, llm, estilo, orquestador, canales, biblioteca, whop
 from fabrica.agentes import estado as estado_agentes, analista, publicador
 from fabrica.ajustes import (BASE_DIR, TRABAJOS_DIR, cargar_ajustes, guardar_ajustes, cargar_nichos,
                              guardar_nichos, cargar_fuentes, guardar_fuentes, cargar_estilo, FORMATOS)
@@ -48,6 +48,7 @@ def _resumen(t: dict) -> dict:
         "programado_para": t["programado_para"], "creado": t["creado"], "actualizado": t["actualizado"],
         "miniatura": f"/media/trabajo/{t['id']}/mini.jpg" if d.get("miniatura") else "",
         "bloqueos": (d.get("revision") or {}).get("bloqueos", []),
+        "campana_id": d.get("campana_id"),
     }
 
 
@@ -77,6 +78,7 @@ def api_estado():
         "modo_publicacion": aj.get("modo_publicacion"),
         "llm": llm.proveedor_activo(),
         "en_curso": activos,
+        "whop_listos": sum(1 for t in db.listar("aprobado") if t["datos"].get("campana_id")),
     })
 
 
@@ -345,6 +347,140 @@ def api_laboratorio():
     if (request.json or {}).get("solo_medir"):
         return jsonify({"antes": estilo.puntaje_humano(texto)})
     return jsonify(estilo.humanizar(texto))
+
+
+# ---------------------------------------------------------------------------
+# Whop: campañas de clipping pagadas por vistas
+# ---------------------------------------------------------------------------
+
+def _campana_o_404(cid):
+    c = whop.obtener_campana(cid)
+    if not c:
+        abort(404)
+    return c
+
+
+@app.route("/api/whop/campanas")
+def api_whop_campanas():
+    return jsonify({"campanas": whop.listar_campanas(), "plataformas": whop.PLATAFORMAS})
+
+
+@app.route("/api/whop/campanas", methods=["POST"])
+def api_whop_crear():
+    b = request.json or {}
+    if not (b.get("nombre") or "").strip():
+        return jsonify({"error": "Ponle nombre a la campaña"}), 400
+    cid = whop.crear_campana(b["nombre"], b)
+    lanzados = whop.lanzar_material(cid) if b.get("lanzar") else []
+    return jsonify({"id": cid, "lanzados": lanzados})
+
+
+@app.route("/api/whop/campanas/<int:cid>")
+def api_whop_campana(cid):
+    c = _campana_o_404(cid)
+    trabajos = db.listar(limite=5000)
+    envs = whop.listar_envios(cid)
+    clips = []
+    for t in whop.trabajos_de(cid, trabajos):
+        r = _resumen(t)
+        meta = t["datos"].get("metadatos", {})
+        r.update({"fuente_url": t["fuente_url"], "video_url": f"/media/trabajo/{t['id']}/final.mp4" if t["datos"].get("video") else "",
+                  "metadatos": {k: meta.get(k) for k in ("titulo", "descripcion", "tags", "captions")},
+                  "inicio": t["datos"].get("inicio"), "fin": t["datos"].get("fin"),
+                  "enlaces": [e for e in envs if e["trabajo_id"] == t["id"]],
+                  "por_subir": t["tipo"] == "clip" and whop.pendiente_de_subir(t, c, envs)})
+        clips.append(r)
+    for e in envs:
+        e["estimado"] = whop.ganancia(e["vistas"], c)
+    return jsonify({**c, "resumen": whop.resumen(c, trabajos, envs), "clips": clips, "envios": envs})
+
+
+@app.route("/api/whop/campanas/<int:cid>", methods=["POST"])
+def api_whop_editar(cid):
+    _campana_o_404(cid)
+    b = request.json or {}
+    whop.actualizar_campana(cid, nombre=b.get("nombre"), estado=b.get("estado"),
+                            datos={k: v for k, v in b.items() if k in whop.CAMPANA_DEFECTO} or None)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/whop/campanas/<int:cid>", methods=["DELETE"])
+def api_whop_cerrar(cid):
+    _campana_o_404(cid)
+    whop.borrar_campana(cid)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/whop/campanas/<int:cid>/material", methods=["POST"])
+def api_whop_material(cid):
+    _campana_o_404(cid)
+    try:
+        ids = whop.lanzar_material(cid, (request.json or {}).get("urls"))
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    return jsonify({"ok": True, "lanzados": ids})
+
+
+@app.route("/api/whop/reglas", methods=["POST"])
+def api_whop_reglas():
+    texto = (request.json or {}).get("texto", "")
+    if not texto.strip():
+        return jsonify({"error": "Pega el texto de la campaña"}), 400
+    return jsonify(whop.extraer_reglas(texto))
+
+
+@app.route("/api/whop/envios", methods=["POST"])
+def api_whop_envio():
+    b = request.json or {}
+    try:
+        eid = whop.registrar_envio(int(b.get("campana_id") or 0), b.get("url", ""),
+                                   int(b["trabajo_id"]) if b.get("trabajo_id") else None, b.get("plataforma", ""))
+    except ValueError as e:
+        return jsonify({"error": str(e)}), 400
+    return jsonify({"id": eid})
+
+
+@app.route("/api/whop/envios/<int:eid>", methods=["POST", "DELETE"])
+def api_whop_envio_editar(eid):
+    if not whop.obtener_envio(eid):
+        abort(404)
+    if request.method == "DELETE":
+        whop.borrar_envio(eid)
+    else:
+        b = request.json or {}
+        campos = {k: b[k] for k in ("estado", "notas") if k in b}
+        for k, conv in (("vistas", int), ("pago", float)):
+            if k in b:
+                try:
+                    campos[k] = conv(b[k] or 0)
+                except (TypeError, ValueError):
+                    return jsonify({"error": f"{k} no es un número"}), 400
+        whop.actualizar_envio(eid, **campos)
+    return jsonify({"ok": True})
+
+
+@app.route("/api/whop/envios/<int:eid>/vistas", methods=["POST"])
+def api_whop_vistas(eid):
+    try:
+        return jsonify({"vistas": whop.leer_vistas(eid)})
+    except Exception as e:
+        return jsonify({"error": f"No pude leer las vistas: {str(e)[:200]}. Ponlas a mano."}), 400
+
+
+@app.route("/api/whop/vistas", methods=["POST"])
+def api_whop_todas_vistas():
+    threading.Thread(target=whop.actualizar_todas_las_vistas, daemon=True).start()
+    return jsonify({"ok": True})
+
+
+@app.route("/api/whop/clips/<int:tid>/youtube", methods=["POST"])
+def api_whop_youtube(tid):
+    t = db.obtener(tid)
+    if not t or not t["datos"].get("campana_id"):
+        abort(404)
+    if t["estado"] not in ("aprobado", "programado"):
+        return jsonify({"error": "Primero apruébalo en Revisión"}), 400
+    return jsonify(publicador.publicar(t))
 
 
 def run_server(host="127.0.0.1", port=5050, trabajador=True):

@@ -5,6 +5,9 @@ Un "trabajo" es una pieza de contenido en producción. Los tipos son:
 - fuente_clip: un video/VOD largo que el Clipper analiza para sacar momentos.
 - clip: un momento concreto recortado de una fuente_clip (trabajo hijo).
 - original: un video nuevo escrito a partir de un tema o de un video de referencia.
+
+Las campañas de Whop (clipping pagado por vistas) y los enlaces enviados a cada una
+viven en las tablas campanas y envios; su lógica está en fabrica/whop.py.
 """
 import json
 import sqlite3
@@ -62,7 +65,30 @@ def iniciar() -> None:
             url TEXT PRIMARY KEY,
             fecha TEXT NOT NULL
         );
+        CREATE TABLE IF NOT EXISTS campanas (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nombre TEXT NOT NULL,
+            estado TEXT NOT NULL DEFAULT 'activa',
+            datos TEXT DEFAULT '{}',
+            creado TEXT NOT NULL,
+            actualizado TEXT NOT NULL
+        );
+        CREATE TABLE IF NOT EXISTS envios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            campana_id INTEGER NOT NULL,
+            trabajo_id INTEGER,
+            plataforma TEXT NOT NULL,
+            url TEXT NOT NULL,
+            estado TEXT NOT NULL DEFAULT 'publicado',
+            vistas INTEGER DEFAULT 0,
+            pago REAL DEFAULT 0,
+            notas TEXT DEFAULT '',
+            vistas_actualizadas TEXT DEFAULT '',
+            creado TEXT NOT NULL,
+            actualizado TEXT NOT NULL
+        );
         CREATE INDEX IF NOT EXISTS idx_trabajos_estado ON trabajos(estado);
+        CREATE INDEX IF NOT EXISTS idx_envios_campana ON envios(campana_id);
         """)
 
 
