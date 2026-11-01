@@ -2,8 +2,10 @@
 # Requiere Azure CLI: winget install Microsoft.AzureCLI
 # Uso:  powershell -ExecutionPolicy Bypass -File deploy\azure\crear_vm.ps1
 param(
-  [string]$Region = "eastus",          # la región suele cambiar poco el precio; eastus es de las baratas
-  [string]$Tamano = "Standard_B2s",    # 2 vCPU, 4 GB. Si los renders van lentos: Standard_D2as_v5
+  # Azure for Students solo deja brazilsouth, northcentralus, canadacentral, westus2 y spaincentral
+  # (política "Allowed resource deployment regions"). northcentralus es de las más baratas.
+  [string]$Region = "northcentralus",
+  [string]$Tamano = "Standard_B2als_v2", # 2 vCPU, 4 GB (la B2s no existe en northcentralus). Si los renders van lentos: Standard_D2as_v5
   [int]$DiscoGB   = 64
 )
 $ErrorActionPreference = "Stop"
@@ -20,6 +22,10 @@ $vm = az vm create -g $GRUPO -n $VM_NOMBRE `
   --admin-username $VM_USER --generate-ssh-keys `
   --os-disk-size-gb $DiscoGB --storage-sku StandardSSD_LRS `
   --public-ip-sku Standard --nsg-rule SSH -o json | ConvertFrom-Json
+# az no corta el script al fallar: sin esta comprobación se anunciaría "VM lista" sin IP
+if ($LASTEXITCODE -ne 0 -or -not $vm.publicIpAddress) {
+  throw "No se pudo crear la VM. Revisa que la región y el tamaño estén permitidos: az vm list-skus -l $Region --size $Tamano -o table"
+}
 $ip = $vm.publicIpAddress
 
 # SSH solo desde tu IP actual (si cambia, ejecuta permitir_mi_ip.ps1)

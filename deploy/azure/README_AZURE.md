@@ -12,13 +12,14 @@ Los scripts están en `deploy\azure\`. Si PowerShell bloquea los scripts, ejecú
 
 ## 0. Qué VM y cuánto cuesta
 
-| Opción | Para qué | Precio aprox. (Linux, eastus, pago por uso) |
+| Opción | Para qué | Precio aprox. (Linux, northcentralus, pago por uso) |
 |---|---|---|
-| **Standard_B2s** (2 vCPU, 4 GB) | Recomendada para empezar: unos 5–10 Shorts al día con Whisper `base` | ~30 USD/mes |
+| **Standard_B2als_v2** (2 vCPU, 4 GB) | Recomendada para empezar: unos 5–10 Shorts al día con Whisper `base` | ~34 USD/mes |
 | Standard_D2as_v5 (2 vCPU, 8 GB) | Si produces mucho o haces videos largos (CPU sin límite de créditos) | ~65 USD/mes |
 | Disco 64 GB Standard SSD + IP pública | Siempre | ~8 USD/mes |
 
-- Con **Azure for Students** (lo da el GitHub Student Pack) tienes 100 USD de crédito sin tarjeta: unos 2–3 meses de B2s.
+- Con **Azure for Students** (lo da el GitHub Student Pack) tienes 100 USD de crédito sin tarjeta: unos 2–3 meses de B2als_v2.
+- Azure for Students **solo deja crear recursos en** brazilsouth, northcentralus, canadacentral, westus2 y spaincentral (política de la suscripción). `eastus` falla, y la B2s no existe en northcentralus. Por eso `crear_vm.ps1` usa northcentralus + B2als_v2.
 - Las B-series acumulan "créditos de CPU". Si la fábrica renderiza sin parar, se gastan y la CPU baja a ~40 %.
   Lo notarás porque los trabajos tardan el doble. Para cambiar de tamaño sin reinstalar:
   `az vm resize -g rg-fabrica -n vm-fabrica --size Standard_D2as_v5`.
