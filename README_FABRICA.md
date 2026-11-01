@@ -120,9 +120,25 @@ python fabrica.py edicion curiosidades           # mide cortes e insertos de los
 python fabrica.py biblioteca buscar "emú corriendo"
 python fabrica.py conectar-canal curiosidades   # OAuth de un canal (en VPS, con túnel en el puerto 8765)
 python fabrica.py canales
+python fabrica.py musica                        # importa la música propia de P4
 ```
 
 Ejemplo de cron cada hora: `0 * * * * cd /ruta/al/proyecto && python fabrica.py ciclo >> fabrica.log 2>&1`
+
+## Música propia (Motor de Música, P4)
+
+Los videos originales llevan de fondo temas del repo `motor-musica-content-id`: son 100 % propios y están listos para registrarse en Content ID.
+
+```bash
+python fabrica.py musica                                    # toma ../motor-musica-content-id
+python fabrica.py musica D:/ProyectosProgramacion/motor-musica-content-id
+```
+
+- Importa solo los temas del catálogo marcados `content_id_certified` y sin sample packs. Los convierte a MP3 de 192 kbps en `assets/musica/<nicho>/<ISRC>.mp3` y no repite lo que ya existe.
+- Cada género va a los nichos de `GENERO_A_NICHOS` en `fabrica/musica_propia.py`. Los medleys de DJ quedan fuera.
+- El Empaquetador añade a la descripción `Música: «título» — artista (ISRC …)`.
+- `assets/musica/` no se sube a Git; `deploy/azure/subir_codigo.ps1` sí la copia a la VM.
+- **Antes de registrar los temas en Content ID**, pon tus propios canales en la lista blanca de la distribuidora. Si no lo haces, Content ID reclamará tus propios videos.
 
 ## En la nube 24/7 (Azure)
 
@@ -152,7 +168,7 @@ data/fuentes.json     canales que vigila el Explorador
 data/estilos/         patrones aprendidos por nicho
 data/fabrica.db       cola y bitácora (SQLite)
 output/trabajos/NNNNN/  todo lo que genera cada trabajo (final.mp4, mini.jpg, subtítulos…)
-assets/musica/<nicho>/  pon aquí música libre de derechos; el Editor la mezcla con ducking
+assets/musica/<nicho>/  música propia (python fabrica.py musica) o libre de derechos; el Editor la mezcla con ducking
 assets/biblioteca/    recursos libres y propios (los indexa la biblioteca) y efectos generados
 ```
 

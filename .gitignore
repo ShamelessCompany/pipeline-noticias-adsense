@@ -31,3 +31,6 @@ data/youtube_token.json
 cookies.txt
 deploy/azure/config.ps1
 assets/biblioteca/
+
+# Música importada del Motor de Música (se regenera con: python fabrica.py musica)
+assets/musica/

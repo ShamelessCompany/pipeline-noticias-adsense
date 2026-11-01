@@ -9,7 +9,7 @@ import re
 from pathlib import Path
 from typing import Dict, List
 
-from fabrica import db, llm, media, fuentes, subtitulos, metadatos, cumplimiento, estilo, investigacion, broll, montaje
+from fabrica import db, llm, media, fuentes, subtitulos, metadatos, cumplimiento, estilo, investigacion, broll, montaje, musica_propia
 from fabrica.agentes import ocupado, libre
 from fabrica.ajustes import TRABAJOS_DIR, FORMATOS, obtener_nicho, cargar_estilo
 
@@ -129,9 +129,10 @@ def producir_original(t: Dict) -> None:
 
     ocupado("editor", "Planificando planos e insertos según lo que se dice", tid)
     total = media.duracion(voz["ruta"]) + 0.5
+    musica = _musica(nicho)
     try:
         res = montaje.dirigir(g["escenas"], pal["palabras"], voz["ruta"], ass, str(carpeta / "final.mp4"), carpeta,
-                              fmt["ancho"], fmt["alto"], nicho, t["formato"], musica=_musica(nicho))
+                              fmt["ancho"], fmt["alto"], nicho, t["formato"], musica=musica)
     except Exception as ex:
         # Si el montaje con insertos falla, sale igual con el montaje simple (un plano por escena)
         libre("editor", f"Montaje con insertos falló ({str(ex)[:120]}); uso el montaje simple", tid, "aviso")
@@ -144,7 +145,7 @@ def producir_original(t: Dict) -> None:
             v["peso"] = max(1, len(e["texto"].split()))
             visuales.append(v)
         media.montar(visuales, voz["ruta"], ass, str(carpeta / "final.mp4"), fmt["ancho"], fmt["alto"],
-                     musica=_musica(nicho), trabajo_dir=carpeta)
+                     musica=musica, trabajo_dir=carpeta)
         res = {"visuales": visuales, "insertos": [], "creditos": sorted({v["credito"] for v in visuales if v.get("credito")}),
                "receta": {}, "motor": "simple", "cortes": len(visuales),
                "cortes_por_min": round(len(visuales) * 60 / total, 1)}
@@ -161,6 +162,8 @@ def producir_original(t: Dict) -> None:
         creditos.append(f"Inspirado en: {ref['url']}")
     creditos += [f"Fuente: {f['url']}" for f in dos["fuentes"]]
     creditos += [f"Imágenes y video: {c}" for c in res["creditos"]]
+    if musica_propia.credito(musica):
+        creditos.append(musica_propia.credito(musica))
     meta = metadatos.generar(guion, nicho, t["formato"], creditos,
                              cargar_estilo(t["nicho"]).get("formulas_titulo", []), g.get("titulo_trabajo", ""))
     libre("empaquetador")

@@ -11,6 +11,7 @@ Fábrica de Contenido: punto de entrada.
   python fabrica.py biblioteca importar CARPETA --licencia cc0 [--credito AUTOR] [--nicho N]
   python fabrica.py biblioteca indice  Calcula la búsqueda por significado (requiere sentence-transformers)
   python fabrica.py biblioteca buscar "texto"
+  python fabrica.py musica [RUTA_MOTOR] Importa la música propia del Motor de Música (P4) a assets/musica/
   python fabrica.py estado             Resumen de la cola
   python fabrica.py conectar-canal ALIAS   Autoriza un canal de YouTube (por SSH con túnel en el puerto 8765)
   python fabrica.py canales            Lista los canales conectados
@@ -68,8 +69,10 @@ def main():
     pb.add_argument("--licencia", default="propio")
     pb.add_argument("--credito", default="")
     pb.add_argument("--nicho", default="")
+    pm = sub.add_parser("musica")
+    pm.add_argument("origen", nargs="?", default="", help="Carpeta de motor-musica-content-id (por defecto, la hermana de este repo)")
     sub.add_parser("estado")
-    pcc = sub.add_parser("conectar-canal")
+    pcc =sub.add_parser("conectar-canal")
     pcc.add_argument("alias", help="Nombre corto del canal, p. ej. curiosidades")
     pcc.add_argument("--puerto", type=int, default=8765)
     sub.add_parser("canales")
@@ -107,6 +110,12 @@ def main():
     elif a.cmd == "edicion":
         import json
         print(json.dumps(analista.analizar_edicion(a.nicho), ensure_ascii=False, indent=2))
+    elif a.cmd == "musica":
+        from fabrica import musica_propia
+        nuevos = musica_propia.importar(Path(a.origen) if a.origen else None)
+        for nicho, archivos in sorted(nuevos.items()):
+            print(f"{nicho}: {len(archivos)} pistas nuevas")
+        print("Nada nuevo que importar." if not nuevos else f"Listo en {musica_propia.MUSICA_DIR}")
     elif a.cmd == "biblioteca":
         from fabrica import biblioteca
         if a.accion == "importar":
