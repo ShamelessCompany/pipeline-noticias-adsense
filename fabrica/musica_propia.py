@@ -33,8 +33,17 @@ def _cargar_manifiesto() -> Dict[str, Dict]:
     return {}
 
 
+def _apto(tema: Dict) -> bool:
+    """Certificado por checks reales. Los catálogos de antes del 2026-11-01 traían
+    content_id_certified=True fijo y sin content_id_checks: esos no cuentan."""
+    checks = tema.get("content_id_checks") or ""
+    return (bool(tema.get("content_id_certified")) and not tema.get("sample_packs_used")
+            and bool(checks) and not checks.startswith("sin verificar") and "=falla" not in checks)
+
+
 def importar(origen: Optional[Path] = None, bitrate: str = "192k") -> Dict[str, List[str]]:
-    """Convierte y reparte los temas del catálogo de P4. Devuelve {nicho: [archivos nuevos]}."""
+    """Convierte y reparte los temas del catálogo de P4 y retira los que dejaron de estar certificados.
+    Devuelve {nicho: [archivos nuevos]} y, si hubo, {"retirados": [archivos]}."""
     from fabrica.media import _ff
 
     origen = Path(origen or ORIGEN_DEFECTO)
@@ -44,7 +53,14 @@ def importar(origen: Optional[Path] = None, bitrate: str = "192k") -> Dict[str, 
     manifiesto = _cargar_manifiesto()
     nuevos: Dict[str, List[str]] = {}
     for tema in json.loads(catalogo.read_text(encoding="utf-8")):
-        if not tema.get("content_id_certified") or tema.get("sample_packs_used"):
+        if not _apto(tema):
+            nombre = f"{tema.get('isrc')}.mp3"
+            retirados = [p for p in MUSICA_DIR.glob(f"*/{nombre}")] if MUSICA_DIR.exists() else []
+            for p in retirados:
+                p.unlink()
+            en_manifiesto = manifiesto.pop(nombre, None) is not None
+            if retirados or en_manifiesto:
+                nuevos.setdefault("retirados", []).append(nombre)
             continue
         wav = origen / "output" / "audio" / tema["audio_filename"]
         if not wav.exists():

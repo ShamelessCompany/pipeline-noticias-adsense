@@ -113,8 +113,12 @@ def main():
     elif a.cmd == "musica":
         from fabrica import musica_propia
         nuevos = musica_propia.importar(Path(a.origen) if a.origen else None)
+        retirados = nuevos.pop("retirados", [])
         for nicho, archivos in sorted(nuevos.items()):
             print(f"{nicho}: {len(archivos)} pistas nuevas")
+        if retirados:
+            print(f"Retiradas por no pasar los checks de P4: {', '.join(retirados)}")
+            nuevos["retirados"] = retirados
         print("Nada nuevo que importar." if not nuevos else f"Listo en {musica_propia.MUSICA_DIR}")
     elif a.cmd == "biblioteca":
         from fabrica import biblioteca

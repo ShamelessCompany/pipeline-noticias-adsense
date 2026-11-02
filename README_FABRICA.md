@@ -135,7 +135,7 @@ python fabrica.py musica                                    # toma ../motor-musi
 python fabrica.py musica D:/ProyectosProgramacion/motor-musica-content-id
 ```
 
-- Importa solo los temas del catálogo marcados `content_id_certified` y sin sample packs. Los convierte a MP3 de 192 kbps en `assets/musica/<nicho>/<ISRC>.mp3` y no repite lo que ya existe.
+- Importa solo los temas que traen checks reales aprobados (`content_id_certified` y `content_id_checks` sin fallos) y sin sample packs. Un catálogo de antes del 2026-11-01, sin `content_id_checks`, no entra: primero hay que correr `python reevaluar_catalogo.py --aplicar` en P4. Los temas que dejan de estar certificados **se retiran** de `assets/musica/`. Los convierte a MP3 de 192 kbps en `assets/musica/<nicho>/<ISRC>.mp3` y no repite lo que ya existe.
 - Cada género va a los nichos de `GENERO_A_NICHOS` en `fabrica/musica_propia.py`. Los medleys de DJ quedan fuera.
 - El Empaquetador añade a la descripción `Música: «título» — artista (ISRC …)`.
 - `assets/musica/` no se sube a Git; `deploy/azure/subir_codigo.ps1` sí la copia a la VM.
