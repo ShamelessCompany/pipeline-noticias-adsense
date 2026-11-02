@@ -171,7 +171,8 @@ def producir_original(t: Dict) -> None:
     ocupado("revisor", "Comprobando originalidad y normas", tid)
     rev = cumplimiento.revisar_original(guion, ref["texto"], meta, voz["simulada"], visuales,
                                         int(nicho.get("min_palabras", FORMATOS[t["formato"]]["palabras"][0] * 0.7)),
-                                        insertos=res["insertos"])
+                                        insertos=res["insertos"], motor=g.get("motor", ""),
+                                        fuentes_texto="\n".join(f.get("texto", "") for f in dos["fuentes"]))
     libre("revisor", f"Puntaje {rev['puntaje']}/100" + (f", bloqueos: {', '.join(rev['bloqueos'])}" if rev["bloqueos"] else ""),
           tid, "ok" if not rev["bloqueos"] else "aviso")
     db.fusionar_datos(tid, video=str(final), miniatura=str(carpeta / "mini.jpg"), metadatos=meta, revision=rev,

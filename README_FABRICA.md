@@ -74,6 +74,7 @@ Las etiquetas salen del nombre del archivo y de sus carpetas, así que conviene 
 
 - **Clips:** la fuente tiene que estar en *Fuentes* con «permite clips», o marcada a mano. Sin permiso, el clip queda **bloqueado**. El Revisor también pide aporte propio visible (título en pantalla, subtítulos y una intro narrada con contexto) y crédito con enlace al creador.
 - **Originales:** menos del 12 % de frases de 5 palabras coincidentes con la referencia (con 25 % o más, bloquea), una extensión mínima, un puntaje de escritura humana de 70 o más y una voz real (no simulada).
+  Además se **bloquean** dos casos: el guion de respaldo sin modelo de lenguaje (pega frases de la investigación entre conectores fijos: contenido reutilizado y repetitivo) y copiar 25 % o más de las frases de las fuentes de la investigación (con 12 % ya resta puntos). Sin un LLM configurado en *Ajustes*, ningún original se aprueba solo.
 - Por defecto la **aprobación es manual**. YouTube pide que los canales automatizados tengan supervisión humana real. Puedes activar la autoaprobación con un umbral en *Ajustes*, pero lo bloqueado nunca se aprueba solo.
 
 ## Campañas de Whop (clipping pagado por vistas)

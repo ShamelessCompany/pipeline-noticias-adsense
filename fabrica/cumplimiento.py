@@ -62,7 +62,10 @@ def revisar_clip(datos: Dict, meta: Dict, url_fuente: str, permiso_manual: bool 
 
 
 def revisar_original(guion: str, referencia: str, meta: Dict, voz_simulada: bool,
-                     visuales: List[Dict], min_palabras: int, insertos: Optional[List[Dict]] = None) -> Dict:
+                     visuales: List[Dict], min_palabras: int, insertos: Optional[List[Dict]] = None,
+                     motor: str = "", fuentes_texto: str = "") -> Dict:
+    """motor: quién escribió el guion ('respaldo-local' = plantilla sin LLM).
+    fuentes_texto: texto completo de la investigación, para detectar frases copiadas de ella."""
     sol = solapamiento(guion, referencia) if referencia else 0.0
     hum = estilo.puntaje_humano(guion)
     propios = sum(1 for v in visuales if v.get("origen") != "generado")
@@ -80,6 +83,18 @@ def revisar_original(guion: str, referencia: str, meta: Dict, voz_simulada: bool
               f"{len(visuales)} tomas, {propios} de bancos libres con crédito", 10),
         _item("Título no engañoso", _titulo_ok(meta.get("titulo", "")), meta.get("titulo", ""), 15),
     ]
+    if motor:
+        # La plantilla sin LLM pega frases de las fuentes entre conectores fijos: contenido
+        # reutilizado y repetitivo, justo lo que YouTube desmonetiza. Nunca se aprueba sola.
+        respaldo = motor == "respaldo-local"
+        items.append(_item("Guion escrito para este video", not respaldo,
+                           "Plantilla sin modelo de lenguaje: configura uno en Ajustes y regenera" if respaldo
+                           else f"Escrito por {motor}", 30, bloqueante=respaldo))
+    if fuentes_texto:
+        sol_f = solapamiento(guion, fuentes_texto)
+        items.append(_item("Sin copiar las fuentes", sol_f < 12,
+                           f"{sol_f}% de frases de 5 palabras copiadas de la investigación", 30,
+                           bloqueante=sol_f >= 25))
     if insertos is not None:
         items.append(licencias_recursos(visuales + insertos))
     return _cerrar(items)
